@@ -13,13 +13,24 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
+
+             $table->string('name');
+             $table->string('email')->unique();
+             $table->timestamp('email_verified_at')->nullable();
+             $table->string('password');
+             $table->rememberToken();
+
+              $table->enum('role', ['pembeli', 'promotor', 'super_admin'])
+          ->default('pembeli');
+
+             $table->string('nik', 16)->nullable();
+             $table->text('alamat')->nullable();
+             $table->string('no_hp', 20)->nullable();
+
+             $table->boolean('is_promotor_disetujui')->default(false);
+
+             $table->timestamps();
+});
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
