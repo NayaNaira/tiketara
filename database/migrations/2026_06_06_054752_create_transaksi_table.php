@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('id')->primary();
 
             $table->foreignId('id_user')
-                  ->constrained('pengguna');
+                  ->constrained('users');
 
             $table->foreignId('id_event')
                   ->constrained('acara')

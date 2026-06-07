@@ -32,7 +32,17 @@
                 Daftar untuk mulai mengelola tiket dan event Anda.
             </p>
 
-            <form action="#" method="POST">
+            @if ($errors->any())
+                <div style="color:red; margin-bottom:10px;">
+                 <ul>
+                     @foreach ($errors->all() as $error)
+                     <li>{{ $error }}</li>
+                     @endforeach
+                 </ul>
+                </div>
+            @endif
+
+            <form action="{{  route('register') }}" method="POST">
                 @csrf
 
                 <!-- Nama -->

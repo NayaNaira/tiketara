@@ -21,7 +21,11 @@ return new class extends Migration
              $table->rememberToken();
 
               $table->enum('role', ['pembeli', 'promotor', 'super_admin'])
-          ->default('pembeli');
+                    ->default('pembeli');
+              $table->enum('status', ['verify', 'active', 'banned'])
+                    ->default('verify');
+            
+
 
              $table->string('nik', 16)->nullable();
              $table->text('alamat')->nullable();

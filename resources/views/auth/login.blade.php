@@ -29,7 +29,7 @@
                 Kelola konser dan transaksi dalam satu platform.
             </p>
 
-            <form action="#" method="POST">
+            <form action="{{ route('login') }}" method="POST">
                 @csrf
 
                 <!-- Email -->
