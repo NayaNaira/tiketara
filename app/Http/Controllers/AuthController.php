@@ -11,35 +11,86 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect('/dashboard');
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'Email tidak ditemukan'
+            ])->withInput();
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah'
-        ]);
+        if (!$user->hasVerifiedEmail()) {
+            return back()->withErrors([
+                'email' => 'Silakan verifikasi email terlebih dahulu'
+            ])->withInput();
+        }
+
+        $credentials = $request->only('email', 'password');
+
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors([
+                'email' => 'Email atau password salah'
+            ])->withInput();
+        }
+
+        $request->session()->regenerate();
+
+        // Redirect berdasarkan role
+        if ($user->role === 'super_admin') {
+            return redirect('/super');
+        }
+
+        if ($user->role === 'promotor') {
+            return redirect('/admin');
+        }
+
+        return redirect('/dashboard');
     }
 
     public function register(Request $request)
-{
-    $request->validate([
-        'name' => 'required',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:4',
-    ],[
-    'password.min' => 'Password minimal harus 6 karakter',
-    'email.unique' => 'Email sudah terdaftar',
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+        ], [
+            'name.required' => 'Nama wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
+            'password.required' => 'Password wajib diisi',
+            'password.min' => 'Password minimal 6 karakter',
+            #'password.confirmed' => 'Konfirmasi password tidak cocok',
+        ]);
 
-    User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-    ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => 'pembeli',
+            'password' => Hash::make($request->password),
+        ]);
 
-    return redirect('/login')->with('success', 'Register berhasil, silakan login');
+        $user->sendEmailVerificationNotification();
+
+        return redirect('/login')->with(
+            'success',
+            'Register berhasil. Silakan cek email untuk verifikasi akun.'
+        );
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
     }
 }
