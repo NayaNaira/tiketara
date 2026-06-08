@@ -18,7 +18,7 @@ use App\Notifications\VerifyEmailNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
     public function sendEmailVerificationNotification()
     {
     $this->notify(new VerifyEmailNotification);

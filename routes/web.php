@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\AcaraController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -86,3 +88,24 @@ Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showRes
 
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
 ->name('password.update');
+
+//route acara
+Route::apiResource('/acara', AcaraController::class); 
+
+use App\Models\Acara;
+
+Route::get('/test-acara', function () {
+    $acara = App\Models\Acara::all();
+    return view('test-acara', compact('acara'));
+});
+
+Route::get('/test-acara/{id}', function ($id) {
+    $acara = App\Models\Acara::all();
+    $edit = App\Models\Acara::findOrFail($id);
+
+    return view('test-acara', compact('acara', 'edit'));
+});
+
+Route::post('/test-acara', [AcaraController::class, 'store']);
+Route::post('/test-acara/update/{id}', [AcaraController::class, 'update']);
+Route::post('/test-acara/delete/{id}', [AcaraController::class, 'destroy']);
