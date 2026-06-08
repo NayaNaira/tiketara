@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jun 07, 2026 at 07:09 AM
+-- Generation Time: Jun 08, 2026 at 03:26 PM
 -- Server version: 8.4.3
 -- PHP Version: 8.5.7
 
@@ -20,27 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `dbtiketara`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `acara`
---
-
-CREATE TABLE `acara` (
-  `id` bigint UNSIGNED NOT NULL,
-  `id_promotor` bigint UNSIGNED NOT NULL,
-  `judul` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `deskripsi` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `harga` decimal(10,2) NOT NULL,
-  `kategori` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `kuota_tiket` int NOT NULL,
-  `url_poster` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `syarat_ketentuan` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -64,6 +43,27 @@ CREATE TABLE `cache_locks` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `events`
+--
+
+CREATE TABLE `events` (
+  `id` bigint UNSIGNED NOT NULL,
+  `promoter_id` bigint UNSIGNED NOT NULL,
+  `title` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ticket_price` decimal(10,2) NOT NULL,
+  `category` enum('music_festival','seminar_education','sports','arts_theater_culture','lifestyle_holiday','attraction_tourism') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ticket_quota` int NOT NULL,
+  `poster_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `terms_and_conditions` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -120,20 +120,6 @@ CREATE TABLE `job_batches` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `metode_pembayaran`
---
-
-CREATE TABLE `metode_pembayaran` (
-  `id` bigint UNSIGNED NOT NULL,
-  `nama_metode` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_aktif` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `migrations`
 --
 
@@ -151,10 +137,29 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (1, '0001_01_01_000000_create_users_table', 1),
 (2, '0001_01_01_000001_create_cache_table', 1),
 (3, '0001_01_01_000002_create_jobs_table', 1),
-(4, '2026_06_06_054749_create_acara_table', 1),
-(5, '2026_06_06_054750_create_metode_pembayaran_table', 1),
-(6, '2026_06_06_054752_create_transaksi_table', 1),
+(4, '2026_06_06_054749_create_events_table', 1),
+(5, '2026_06_06_054750_create_payment_methods_table', 1),
+(6, '2026_06_06_054752_create_orders_table', 1),
 (7, '2026_06_06_063740_create_personal_access_tokens_table', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `events_id` bigint UNSIGNED NOT NULL,
+  `payment_method_id` bigint UNSIGNED NOT NULL,
+  `quantity` int NOT NULL DEFAULT '1',
+  `total_amount` decimal(10,2) NOT NULL,
+  `status` enum('pending','paid','expired','refunded') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `expired_at` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -166,6 +171,20 @@ CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payment_methods`
+--
+
+CREATE TABLE `payment_methods` (
+  `id` bigint UNSIGNED NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -202,32 +221,6 @@ CREATE TABLE `sessions` (
   `last_activity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `sessions`
---
-
-INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('DSU1XsrPRmsyXV7s3m304hn4TukZ0BgLkpfkpe4t', 4, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'eyJfdG9rZW4iOiJ6V3pkR1ZVNkZER1djTG85M1E0ekY3SjRUYkpQWXRCTGF2UDB3YmFtIiwiX2ZsYXNoIjp7Im9sZCI6W10sIm5ldyI6W119LCJfcHJldmlvdXMiOnsidXJsIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2Rhc2hib2FyZCIsInJvdXRlIjpudWxsfSwidXJsIjp7ImludGVuZGVkIjoiaHR0cDpcL1wvMTI3LjAuMC4xOjgwMDBcL2Rhc2hib2FyZCJ9LCJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI6NH0=', 1780816060);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `transaksi`
---
-
-CREATE TABLE `transaksi` (
-  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `id_user` bigint UNSIGNED NOT NULL,
-  `id_event` bigint UNSIGNED NOT NULL,
-  `id_pembayaran` bigint UNSIGNED NOT NULL,
-  `quantitas` int NOT NULL DEFAULT '1',
-  `total_harga` decimal(10,2) NOT NULL,
-  `status` enum('menunggu','berhasil','expired','refunded') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'menunggu',
-  `pembayaran_expired` datetime NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- --------------------------------------------------------
 
 --
@@ -241,12 +234,12 @@ CREATE TABLE `users` (
   `email_verified_at` timestamp NULL DEFAULT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `role` enum('pembeli','promotor','super_admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pembeli',
+  `role` enum('buyer','promoter','super_admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'buyer',
   `status` enum('verify','active','banned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'verify',
   `nik` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `alamat` text COLLATE utf8mb4_unicode_ci,
-  `no_hp` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_promotor_disetujui` tinyint(1) NOT NULL DEFAULT '0',
+  `address` text COLLATE utf8mb4_unicode_ci,
+  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_promoter_approved` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -255,22 +248,14 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `role`, `status`, `nik`, `alamat`, `no_hp`, `is_promotor_disetujui`, `created_at`, `updated_at`) VALUES
-(1, 'super_admin', 'super_admin@gmail.com', NULL, '$2y$12$3lVPggA/AydV88FMWwTPYOAcnEW4nswBnNG8x15cRl.GVuufjOiGa', NULL, 'super_admin', 'active', NULL, NULL, NULL, 0, '2026-06-06 19:13:05', '2026-06-06 19:13:05'),
-(2, 'promotor', 'promotor@gmail.com', NULL, '$2y$12$Nn3I1WGrMRJDZTh5WhhzF.AmYyXsqdSrhzwxH7JniE/.a/Gluvg5e', NULL, 'promotor', 'active', NULL, NULL, NULL, 0, '2026-06-06 19:13:05', '2026-06-06 19:13:05'),
-(3, 'pembeli', 'pembeli@gmail.com', NULL, '$2y$12$p4azxIsJRDzcWTEMEj2NTuIZdxiz1HN9J888fwgCRqE4XXqa.sB.C', NULL, 'pembeli', 'active', NULL, NULL, NULL, 0, '2026-06-06 19:13:06', '2026-06-06 19:13:06'),
-(4, 'Ahmad Maulana', 'ahmad@gmail.com', NULL, '$2y$12$X0T3dymq9dWtQY8QmZE4bejf/c7lLH0C0p2NZfXWrugjLn4LgrGjm', NULL, 'pembeli', 'verify', NULL, NULL, NULL, 0, '2026-06-06 22:27:18', '2026-06-06 22:27:18');
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `role`, `status`, `nik`, `address`, `phone_number`, `is_promoter_approved`, `created_at`, `updated_at`) VALUES
+(1, 'Super Admin', 'super_admin@gmail.com', '2026-06-08 08:22:38', '$2y$12$WZ0dvh1xOjKrAHtFKQ3snu7ZsX5b4jutIhu3b8w.Ygkrxt7uclhxu', NULL, 'super_admin', 'active', NULL, NULL, NULL, 0, '2026-06-08 08:22:38', '2026-06-08 08:22:38'),
+(2, 'Promoter', 'promoter@gmail.com', '2026-06-08 08:22:39', '$2y$12$QexVj6F/RzXtwHkA9ig5burbEAsZu9UVLgUiVoN7S7vLOdoBNA8WC', NULL, 'promoter', 'active', NULL, NULL, NULL, 1, '2026-06-08 08:22:39', '2026-06-08 08:22:39'),
+(3, 'Buyer', 'buyer@gmail.com', '2026-06-08 08:22:39', '$2y$12$thPuJm5dNYqX1ydylMx0XOzn9hb9XMULBfqmzjx0KWkIkykCvZdom', NULL, 'buyer', 'active', NULL, NULL, NULL, 0, '2026-06-08 08:22:39', '2026-06-08 08:22:39');
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `acara`
---
-ALTER TABLE `acara`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `acara_id_promotor_foreign` (`id_promotor`);
 
 --
 -- Indexes for table `cache`
@@ -285,6 +270,13 @@ ALTER TABLE `cache`
 ALTER TABLE `cache_locks`
   ADD PRIMARY KEY (`key`),
   ADD KEY `cache_locks_expiration_index` (`expiration`);
+
+--
+-- Indexes for table `events`
+--
+ALTER TABLE `events`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `events_promoter_id_foreign` (`promoter_id`);
 
 --
 -- Indexes for table `failed_jobs`
@@ -307,22 +299,31 @@ ALTER TABLE `job_batches`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `metode_pembayaran`
---
-ALTER TABLE `metode_pembayaran`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `orders_user_id_foreign` (`user_id`),
+  ADD KEY `orders_events_id_foreign` (`events_id`),
+  ADD KEY `orders_payment_method_id_foreign` (`payment_method_id`);
+
+--
 -- Indexes for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`email`);
+
+--
+-- Indexes for table `payment_methods`
+--
+ALTER TABLE `payment_methods`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `personal_access_tokens`
@@ -342,15 +343,6 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
--- Indexes for table `transaksi`
---
-ALTER TABLE `transaksi`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `transaksi_id_user_foreign` (`id_user`),
-  ADD KEY `transaksi_id_event_foreign` (`id_event`),
-  ADD KEY `transaksi_id_pembayaran_foreign` (`id_pembayaran`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -362,9 +354,9 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `acara`
+-- AUTO_INCREMENT for table `events`
 --
-ALTER TABLE `acara`
+ALTER TABLE `events`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -380,16 +372,16 @@ ALTER TABLE `jobs`
   MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `metode_pembayaran`
---
-ALTER TABLE `metode_pembayaran`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
   MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `payment_methods`
+--
+ALTER TABLE `payment_methods`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -401,25 +393,25 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `acara`
+-- Constraints for table `events`
 --
-ALTER TABLE `acara`
-  ADD CONSTRAINT `acara_id_promotor_foreign` FOREIGN KEY (`id_promotor`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE `events`
+  ADD CONSTRAINT `events_promoter_id_foreign` FOREIGN KEY (`promoter_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `transaksi`
+-- Constraints for table `orders`
 --
-ALTER TABLE `transaksi`
-  ADD CONSTRAINT `transaksi_id_event_foreign` FOREIGN KEY (`id_event`) REFERENCES `acara` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `transaksi_id_pembayaran_foreign` FOREIGN KEY (`id_pembayaran`) REFERENCES `metode_pembayaran` (`id`),
-  ADD CONSTRAINT `transaksi_id_user_foreign` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
+ALTER TABLE `orders`
+  ADD CONSTRAINT `orders_events_id_foreign` FOREIGN KEY (`events_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `orders_payment_method_id_foreign` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods` (`id`),
+  ADD CONSTRAINT `orders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
