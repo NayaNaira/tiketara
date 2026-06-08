@@ -17,21 +17,22 @@ return new class extends Migration
              $table->string('name');
              $table->string('email')->unique();
              $table->timestamp('email_verified_at')->nullable();
+             
              $table->string('password');
              $table->rememberToken();
 
-              $table->enum('role', ['pembeli', 'promotor', 'super_admin'])
-                    ->default('pembeli');
+              $table->enum('role', ['buyer', 'promoter', 'super_admin'])
+                    ->default('buyer');
               $table->enum('status', ['verify', 'active', 'banned'])
                     ->default('verify');
             
 
 
              $table->string('nik', 16)->nullable();
-             $table->text('alamat')->nullable();
-             $table->string('no_hp', 20)->nullable();
+             $table->text('address')->nullable();
+             $table->string('phone_number', 20)->nullable();
 
-             $table->boolean('is_promotor_disetujui')->default(false);
+             $table->boolean('is_promoter_approved')->default(false);
 
              $table->timestamps();
 });

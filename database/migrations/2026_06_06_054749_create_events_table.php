@@ -11,20 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('acara', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('id_promotor')
+            $table->foreignId('promoter_id')
                   ->constrained('users')
                   ->onDelete('cascade');
 
-            $table->string('judul', 150);
-            $table->text('deskripsi');
-            $table->decimal('harga', 10, 2);
-            $table->enum('kategori', ['Musik & Festival', 'Seminar & Edukasi', 'Olahraga', 'Seni, Teater & Budaya', 'Gaya Hidup & Liburan', 'Atraksi & Wisata']);
-            $table->integer('kuota_tiket');
-            $table->string('url_poster');
-            $table->text('syarat_ketentuan');
+            $table->string('title', 150);
+            $table->text('description');
+            $table->decimal('ticket_price', 10, 2);
+            $table->enum('category', ['music_festival',
+                'seminar_education',
+                'sports',
+                'arts_theater_culture',
+                'lifestyle_holiday',
+                'attraction_tourism']);
+
+            $table->integer('ticket_quota');
+            $table->string('poster_url');
+            $table->text('terms_and_conditions');
 
             $table->enum('status', ['pending', 'approved', 'rejected'])
                   ->default('pending');

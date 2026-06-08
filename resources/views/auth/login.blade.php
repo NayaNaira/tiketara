@@ -42,6 +42,11 @@
                             required>
                     </div>
                 </div>
+                @error('email')
+                     <div class="mt-2 text-sm text-red-400">
+                      {{ $message }}
+                     </div>
+                @enderror
 
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-300 tracking-wide">

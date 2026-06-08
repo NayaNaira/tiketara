@@ -1,119 +1,86 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\AcaraController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| PUBLIC
+|--------------------------------------------------------------------------
+*/
 
-//Route Login
-Route::get('/login', function () {
-    return view('auth.login');
-    })->name('login');
-
-    Route::post('/login', [AuthController::class, 'login']);
+Route::get('/', fn () => view('welcome'));
 
 
-//Route Register
-Route::get('/register', function () {
-    return view('auth.register');
-    })->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');  
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
 
-//Route Logout
+Route::get('/login', fn () => view('auth.login'))->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/register', fn () => view('auth.register'))->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+
 Route::post('/logout', function () {
     Auth::logout();
     session()->invalidate();
     session()->regenerateToken();
 
     return redirect('/login');
-    })->name('logout');
+})->name('logout');
 
 
-//Route Email Verifikasi
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+/*
+|--------------------------------------------------------------------------
+| EMAIL VERIFICATION
+|--------------------------------------------------------------------------
+*/
 
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+Route::get('/email/verify', fn () => view('auth.verify-email'))
+    ->middleware('auth')
+    ->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
+    return redirect('/login')->with('success', 'Email berhasil diverifikasi.');
+})->middleware(['auth', 'signed'])->name('verification.verify');
 
-        return redirect('/login')
-        ->with('success', 'Email berhasil diverifikasi.');
-    })->middleware(['auth', 'signed'])->name('verification.verify');
-
-    Route::post('/email/verification-notification', function (Request $request) {
-
-     $request->user()->sendEmailVerificationNotification();
-
-     return back()->with('success', 'Link verifikasi dikirim ulang.');
-    })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('success', 'Link verifikasi dikirim ulang.');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD (WEB)
+|--------------------------------------------------------------------------
+*/
 
-//Route User  
-Route::get('/admin', function () {
-     return view('admin.dashboard');
-    })->middleware(['auth', 'role:promotor,super_admin']);
+Route::get('/promotor', fn () => view('promotor.dashboard'))
+    ->middleware(['auth', 'role:promotor,super_admin']);
 
-    Route::get('/super', function () {
-     return view('super.dashboard');
-    })->middleware(['auth', 'role:super_admin']);
+Route::get('/super', fn () => view('super.dashboard'))
+    ->middleware(['auth', 'role:super_admin']);
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'role:pembeli,promotor,super_admin']);
+Route::get('/dashboard', fn () => view('dashboard'))
+    ->middleware(['auth', 'role:pembeli,promotor,super_admin']);
 
-Route::get('/test-middleware', function () {
-    dd(class_exists(\App\Http\Middleware\RoleMiddleware::class));
-});
 
-// Route Forgot Password
+/*
+|--------------------------------------------------------------------------
+| ACARA (WEB VIEW ONLY)
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])
-->name('password.request');
-
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
-->name('password.email');
-
-Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])
-->name('password.reset');
-
-Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
-->name('password.update');
-
-//route acara
-Route::apiResource('/acara', AcaraController::class); 
-
-use App\Models\Acara;
-
-Route::get('/test-acara', function () {
-    $acara = App\Models\Acara::all();
-    return view('test-acara', compact('acara'));
-});
-
-Route::get('/test-acara/{id}', function ($id) {
-
-    $acara = App\Models\Acara::all();
-    $edit = App\Models\Acara::findOrFail($id);
-
-    if ($edit->status == 'approved') {
-        return redirect('/test-acara');
-    }
-
-    return view('test-acara', compact('acara', 'edit'));
-});
-
-Route::post('/test-acara', [AcaraController::class, 'store']);
-Route::post('/test-acara/update/{id}', [AcaraController::class, 'update']);
-Route::post('/test-acara/delete/{id}', [AcaraController::class, 'destroy']);
-
-Route::post('/test-acara/approve/{id}', [AcaraController::class, 'approve']);
-Route::post('/test-acara/reject/{id}', [AcaraController::class, 'reject']);
+Route::get('/acara', [AcaraController::class, 'index']);
