@@ -109,3 +109,6 @@ Route::get('/test-acara/{id}', function ($id) {
 Route::post('/test-acara', [AcaraController::class, 'store']);
 Route::post('/test-acara/update/{id}', [AcaraController::class, 'update']);
 Route::post('/test-acara/delete/{id}', [AcaraController::class, 'destroy']);
+
+Route::post('/test-acara/approve/{id}', [AcaraController::class, 'approve']);
+Route::post('/test-acara/reject/{id}', [AcaraController::class, 'reject']);

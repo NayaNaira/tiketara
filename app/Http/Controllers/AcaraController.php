@@ -104,4 +104,26 @@ class AcaraController extends Controller
             'message' => 'Acara berhasil dihapus'
         ]);
     }
+
+        public function approve($id)
+    {
+        $acara = Acara::findOrFail($id);
+
+        $acara->update([
+            'status' => 'approved'
+        ]);
+
+        return redirect('/test-acara');
+    }
+    
+        public function reject($id)
+    {
+        $acara = Acara::findOrFail($id);
+
+        $acara->update([
+            'status' => 'rejected'
+        ]);
+
+        return redirect('/test-acara');
+    }
 }

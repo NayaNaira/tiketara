@@ -62,12 +62,41 @@
 
     <div>
         <label>Kategori</label><br>
-        <input
-            type="text"
-            name="kategori"
-            value="{{ $edit->kategori ?? '' }}"
-            required
-        >
+        <select name="kategori" required>
+
+            <option value="">Pilih Kategori</option>
+
+            <option value="Musik & Festival"
+                {{ ($edit->kategori ?? '') == 'Musik & Festival' ? 'selected' : '' }}>
+                Musik & Festival
+            </option>
+
+            <option value="Seminar & Edukasi"
+                {{ ($edit->kategori ?? '') == 'Seminar & Edukasi' ? 'selected' : '' }}>
+                Seminar & Edukasi
+            </option>
+
+            <option value="Olahraga"
+                {{ ($edit->kategori ?? '') == 'Olahraga' ? 'selected' : '' }}>
+                Olahraga
+            </option>
+
+            <option value="Seni, Teater, & BUdaya"
+                {{ ($edit->kategori ?? '') == 'Seni, Teater, & BUdaya' ? 'selected' : '' }}>
+                Seni, Teater, & BUdaya
+            </option>
+
+            <option value="Gaya Hidup & Liburan"
+                {{ ($edit->kategori ?? '') == 'Gaya Hidup & Liburan' ? 'selected' : '' }}>
+                Gaya Hidup & Liburan
+            </option>
+
+            <option value="Atraksi & Wisata"
+                {{ ($edit->kategori ?? '') == 'Atraksi & Wisata' ? 'selected' : '' }}>
+                Atraksi & Wisata
+            </option>
+
+        </select>
     </div>
 
     <br>
@@ -154,6 +183,36 @@
                 </button>
 
             </form>
+
+            @if($item->status == 'pending')
+
+                <form
+                    action="/test-acara/approve/{{ $item->id }}"
+                    method="POST"
+                    style="display:inline"
+                >
+                    @csrf
+
+                    <button type="submit">
+                        Approve
+                    </button>
+
+                </form>
+
+                <form
+                    action="/test-acara/reject/{{ $item->id }}"
+                    method="POST"
+                    style="display:inline"
+                >
+                    @csrf
+
+                    <button type="submit">
+                        Reject
+                    </button>
+
+                </form>
+
+            @endif
 
         </td>
 
