@@ -100,8 +100,13 @@ Route::get('/test-acara', function () {
 });
 
 Route::get('/test-acara/{id}', function ($id) {
+
     $acara = App\Models\Acara::all();
     $edit = App\Models\Acara::findOrFail($id);
+
+    if ($edit->status == 'approved') {
+        return redirect('/test-acara');
+    }
 
     return view('test-acara', compact('acara', 'edit'));
 });

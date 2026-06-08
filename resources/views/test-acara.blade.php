@@ -167,9 +167,10 @@
 
         <td>
 
-            <a href="/test-acara/{{ $item->id }}">
-                Edit
-            </a>
+            @if($item->status != 'approved')
+
+
+            @endif
 
             <form
                 action="/test-acara/delete/{{ $item->id }}"
@@ -185,6 +186,10 @@
             </form>
 
             @if($item->status == 'pending')
+
+                <a href="/test-acara/{{ $item->id }}">
+                        Edit
+                </a>
 
                 <form
                     action="/test-acara/approve/{{ $item->id }}"
