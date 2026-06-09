@@ -59,7 +59,7 @@ CREATE TABLE `events` (
   `ticket_price` decimal(10,2) NOT NULL,
   `category` enum('music_festival','seminar_education','sports','arts_theater_culture','lifestyle_holiday','attraction_tourism') COLLATE utf8mb4_unicode_ci NOT NULL,
   `ticket_quota` int NOT NULL,
-  `poster_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `poster_path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `terms_and_conditions` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` enum('pending','approved','rejected') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT NULL,

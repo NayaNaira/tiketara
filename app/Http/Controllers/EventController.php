@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class EventController extends Controller
 {
     public function index()
     {
+        $events = Event::with('galleries')->latest()->get();
+
+        return view('event', compact('events'));
         return response()->json([
             'success' => true,
             'data' => Event::all()
@@ -34,18 +39,33 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'promoter_id' => 'required|exists:users,id',
-            'title' => 'required|max:150',
-            'description' => 'required',
-            'ticket_price' => 'required|numeric|min:0',
-            'category' => 'required|max:100',
-            'ticket_quota' => 'required|integer|min:1',
-            'poster_url' => 'required|string',
-            'terms_and_conditions' => 'required',
-        ]);
+       $validated = $request->validate([
+    'title' => 'required|max:150',
+    'description' => 'required',
+    'category' => 'required',
 
-        $event = Event::create($validated);
+    'venue_name' => 'required',
+    'address' => 'required',
+    'city' => 'required',
+
+    'event_date' => 'required|date',
+    'start_time' => 'required',
+    'end_time' => 'required',
+
+    'ticket_price' => 'required|numeric|min:0',
+    'ticket_quota' => 'required|integer|min:1',
+
+    'terms_and_conditions' => 'required',
+
+    'poster' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+]);
+$posterPath = $request->file('poster')
+    ->store('events/posters', 'public');
+
+$validated['promoter_id'] = Auth::id();
+$validated['poster_path'] = $posterPath;
+
+$event = Event::create($validated);
 
         return response()->json([
             'success' => true,
@@ -71,7 +91,8 @@ class EventController extends Controller
             'ticket_price' => 'sometimes|numeric|min:0',
             'category' => 'sometimes|max:100',
             'ticket_quota' => 'sometimes|integer|min:1',
-            'poster_url' => 'sometimes|string',
+            'max_ticket_per_order' => 'required|integer|min:1',
+            'poster_path' => 'sometimes|string',
             'terms_and_conditions' => 'sometimes',
             'status' => 'sometimes|in:pending,approved,rejected',
         ]);
@@ -133,4 +154,5 @@ class EventController extends Controller
             'data' => $event
         ]);
     }
+
 }

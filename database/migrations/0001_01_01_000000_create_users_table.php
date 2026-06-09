@@ -22,13 +22,15 @@ return new class extends Migration
              $table->rememberToken();
 
               $table->enum('role', ['buyer', 'promoter', 'super_admin'])
-                    ->default('buyer');
+                    ->default('buyer')
+                     ->index();
               $table->enum('status', ['verify', 'active', 'banned'])
-                    ->default('verify');
+                    ->default('verify')
+                     ->index();
             
 
 
-             $table->string('nik', 16)->nullable();
+             $table->string('nik', 16)->nullable()->unique();
              $table->text('address')->nullable();
              $table->string('phone_number', 20)->nullable();
 

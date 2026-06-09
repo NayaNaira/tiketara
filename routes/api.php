@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AcaraController;
+use App\Http\Controllers\EventController;
 
 
 /*
@@ -44,25 +44,25 @@ Route::middleware('auth:sanctum')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| ACARA API (CRUD)
+| EVENT API (CRUD)
 |--------------------------------------------------------------------------
 */
 
-Route::get('/acara', [AcaraController::class, 'apiIndex']);
+Route::get('/event', [EventController::class, 'apiIndex']);
 
-Route::post('/acara', [AcaraController::class, 'apiStore']);
+Route::post('/event', [EventController::class, 'apiStore']);
 
-Route::put('/acara/{id}', [AcaraController::class, 'apiUpdate']);
+Route::put('/event/{id}', [EventController::class, 'apiUpdate']);
 
-Route::delete('/acara/{id}', [AcaraController::class, 'apiDestroy']);
+Route::delete('/event/{id}', [EventController::class, 'apiDestroy']);
 
 
 /*
 |--------------------------------------------------------------------------
-| ACARA ACTION (BUSINESS LOGIC)
+| EVENT ACTION (BUSINESS LOGIC)
 |--------------------------------------------------------------------------
 */
 
-Route::post('/acara/{id}/approve', [AcaraController::class, 'approve']);
+Route::post('/event/{id}/approve', [EventController::class, 'approve']);
 
-Route::post('/acara/{id}/reject', [AcaraController::class, 'reject']);
+Route::post('/event/{id}/reject', [EventController::class, 'reject']);

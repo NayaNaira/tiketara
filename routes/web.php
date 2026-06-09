@@ -2,13 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
-use App\Http\Controllers\AcaraController;
-
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventGalleryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,20 +69,29 @@ Route::post('/email/verification-notification', function (Request $request) {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/promotor', fn () => view('promotor.dashboard'))
-    ->middleware(['auth', 'role:promotor,super_admin']);
+Route::get('/promoter', fn () => view('promoter.dashboard'))
+    ->middleware(['auth', 'role:promoter,super_admin']);
 
 Route::get('/super', fn () => view('super.dashboard'))
     ->middleware(['auth', 'role:super_admin']);
 
 Route::get('/dashboard', fn () => view('dashboard'))
-    ->middleware(['auth', 'role:pembeli,promotor,super_admin']);
+    ->middleware(['auth', 'role:pembeli,promoter,super_admin']);
 
 
 /*
 |--------------------------------------------------------------------------
-| ACARA (WEB VIEW ONLY)
+| EVENT (WEB VIEW ONLY)
 |--------------------------------------------------------------------------
 */
+Route::get('/event', [EventController::class, 'index'])
+    ->name('event');
 
-Route::get('/acara', [AcaraController::class, 'index']);
+Route::post('/event', [EventController::class, 'store'])
+    ->name('event.store');
+
+Route::post('/event/{event}/gallery', [EventGalleryController::class, 'store'])
+    ->middleware(['auth', 'role:promoter']);
+
+Route::delete('/event/{event}/gallery/{gallery}', [EventGalleryController::class, 'destroy'])
+    ->middleware(['auth', 'role:promoter']);
