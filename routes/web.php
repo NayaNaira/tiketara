@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventGalleryController;
+use App\Http\Controllers\TicketTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,3 +103,9 @@ Route::post('/event/{event}/gallery', [EventGalleryController::class, 'store'])
 
 Route::delete('/event/{event}/gallery/{gallery}', [EventGalleryController::class, 'destroy'])
     ->middleware(['auth', 'role:promoter']);
+
+Route::get('/ticket-types', [TicketTypeController::class, 'index']);
+Route::post('/ticket-types', [TicketTypeController::class, 'store'])
+    ->name('ticket-types.store');
+
+    
