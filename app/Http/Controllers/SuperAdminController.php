@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
-use App\Models\Order; // Assuming there is an Order model
-
+use App\Models\Order;
 class SuperAdminController extends Controller
 {
     public function summary()
@@ -22,8 +21,6 @@ class SuperAdminController extends Controller
 
     public function eventDetail($id)
     {
-        // Mocking an event for visual testing based on screenshot
-        // SZA SOS World Tour 2026
         $event = Event::find($id) ?? new Event([
             'id' => 1,
             'title' => 'SZA SOS World Tour 2026',
@@ -37,7 +34,6 @@ class SuperAdminController extends Controller
 
     public function transactions()
     {
-        // Mocking transactions for now
         $transactions = [];
         return view('super.transactions.index', compact('transactions'));
     }
