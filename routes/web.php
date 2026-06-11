@@ -72,8 +72,15 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/promoter', fn () => view('promoter.dashboard'))
     ->middleware(['auth', 'role:promoter,super_admin']);
 
-Route::get('/super', fn () => view('super.dashboard'))
-    ->middleware(['auth', 'role:super_admin']);
+Route::prefix('super')->middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::get('/', [App\Http\Controllers\SuperAdminController::class, 'events'])->name('super.events.index');
+    Route::get('/summary', [App\Http\Controllers\SuperAdminController::class, 'summary'])->name('super.summary');
+    Route::get('/events/{id}', [App\Http\Controllers\SuperAdminController::class, 'eventDetail'])->name('super.events.show');
+    Route::get('/transactions', [App\Http\Controllers\SuperAdminController::class, 'transactions'])->name('super.transactions.index');
+    Route::get('/transactions/{id}', [App\Http\Controllers\SuperAdminController::class, 'transactionDetail'])->name('super.transactions.show');
+    Route::get('/reports', [App\Http\Controllers\SuperAdminController::class, 'reports'])->name('super.reports.index');
+    Route::get('/export', [App\Http\Controllers\SuperAdminController::class, 'export'])->name('super.export');
+});
 
 Route::get('/dashboard', fn () => view('dashboard'))
     ->middleware(['auth', 'role:pembeli,promoter,super_admin']);
