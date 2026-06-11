@@ -12,6 +12,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventGalleryController;
 use App\Http\Controllers\TicketTypeController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,4 +109,5 @@ Route::get('/ticket-types', [TicketTypeController::class, 'index']);
 Route::post('/ticket-types', [TicketTypeController::class, 'store'])
     ->name('ticket-types.store');
 
-    
+Route::get('/order', [OrderController::class, 'index']);
+Route::post('/order', [OrderController::class, 'store']);
