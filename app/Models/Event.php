@@ -64,5 +64,8 @@ class Event extends Model
         return $this->hasMany(TicketType::class);
     }
 
-    
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'events_id');
+    }
 }
