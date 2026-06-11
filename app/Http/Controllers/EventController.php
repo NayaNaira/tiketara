@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\EventGallery;
 
 
 class EventController extends Controller
@@ -58,6 +59,10 @@ class EventController extends Controller
     'terms_and_conditions' => 'required',
 
     'poster' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+    'gallery' => 'nullable|array',
+    'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+
 ]);
 $posterPath = $request->file('poster')
     ->store('events/posters', 'public');
@@ -67,12 +72,28 @@ $validated['poster_path'] = $posterPath;
 
 $event = Event::create($validated);
 
+if ($request->hasFile('gallery')) {
+
+    foreach ($request->file('gallery') as $image) {
+
+        $path = $image->store('events/gallery', 'public');
+
+        EventGallery::create([
+            'event_id' => $event->id,
+            'image_path' => $path,
+        ]);
+    }
+}
+
         return response()->json([
             'success' => true,
             'message' => 'Event created successfully',
             'data' => $event
         ], 201);
+        
     }
+
+
 
     public function update(Request $request, $id)
     {
