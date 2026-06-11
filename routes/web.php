@@ -98,14 +98,22 @@ Route::get('/event', [EventController::class, 'index'])
 Route::post('/event', [EventController::class, 'store'])
     ->name('event.store');
 
+Route::get('/event/{id}/edit', [EventController::class, 'edit'])
+    ->name('event.edit');
+
+Route::put('/event/{id}', [EventController::class, 'update'])
+    ->name('event.update');
+
+Route::delete('/event/{id}', [EventController::class, 'destroy'])
+    ->name('event.destroy');
+
 Route::post('/event/{event}/gallery', [EventGalleryController::class, 'store'])
     ->middleware(['auth', 'role:promoter']);
 
 Route::delete('/event/{event}/gallery/{gallery}', [EventGalleryController::class, 'destroy'])
     ->middleware(['auth', 'role:promoter']);
 
-Route::get('/ticket-types', [TicketTypeController::class, 'index']);
+Route::get('/ticket-types', [TicketTypeController::class, 'index'])
+    ->name('ticket-types.index');
 Route::post('/ticket-types', [TicketTypeController::class, 'store'])
     ->name('ticket-types.store');
-
-    

@@ -6,13 +6,16 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\EventGallery;
-
+use App\Models\TicketType;
 
 class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::with('galleries')->latest()->get();
+        $events = Event::with([
+         'galleries',
+         'ticketTypes'
+        ])->latest()->get();
 
         return view('event', compact('events'));
         return response()->json([
@@ -20,7 +23,7 @@ class EventController extends Controller
             'data' => Event::all()
         ]);
     }
-
+    //Tayangkan detail event
     public function show($id)
     {
         $event = Event::find($id);
@@ -38,73 +41,96 @@ class EventController extends Controller
         ]);
     }
 
+
+    //Simpan event
     public function store(Request $request)
     {
        $validated = $request->validate([
-    'title' => 'required|max:150',
-    'description' => 'required',
-    'category' => 'required',
+            'title' => 'required|max:150',
+            'description' => 'required',
+            'category' => 'required',
 
-    'venue_name' => 'required',
-    'address' => 'required',
-    'city' => 'required',
+            'venue_name' => 'required',
+            'address' => 'required',
+            'city' => 'required',
 
-    'event_date' => 'required|date',
-    'start_time' => 'required',
-    'end_time' => 'required',
+            'event_date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
 
-    'ticket_price' => 'required|numeric|min:0',
-    'ticket_quota' => 'required|integer|min:1',
+            'ticket_price' => 'required|numeric|min:0',
+            'ticket_quota' => 'required|integer|min:1',
 
-    'terms_and_conditions' => 'required',
+            'terms_and_conditions' => 'required',
 
-    'poster' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'poster' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
 
-    'gallery' => 'nullable|array',
-    'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
 
-]);
-$posterPath = $request->file('poster')
-    ->store('events/posters', 'public');
+            'ticket_name.*' => 'required|string|max:100',
+            'ticket_type_price.*' => 'required|numeric|min:0',
+            'ticket_type_quota.*' => 'required|integer|min:1',
 
-$validated['promoter_id'] = Auth::id();
-$validated['poster_path'] = $posterPath;
+       ]);
 
-$event = Event::create($validated);
+        $posterPath = $request->file('poster')
+                    ->store('events/posters', 'public');
 
-if ($request->hasFile('gallery')) {
+        $validated['promoter_id'] = Auth::id();
+        $validated['poster_path'] = $posterPath;
 
-    foreach ($request->file('gallery') as $image) {
+        $event = Event::create($validated);
+            //Simpan Gallery
+            if ($request->hasFile('gallery')) {
 
-        $path = $image->store('events/gallery', 'public');
+                foreach ($request->file('gallery') as $image) {
 
-        EventGallery::create([
-            'event_id' => $event->id,
-            'image_path' => $path,
-        ]);
-    }
-}
+                $path = $image->store('events/gallery', 'public');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Event created successfully',
-            'data' => $event
-        ], 201);
+                    EventGallery::create([
+                     'event_id' => $event->id,
+                     'image_path' => $path,
+                    ]);
+                }
+            }
+
+            //Simpan Tipe/Kategori Tiket
+            if ($request->filled('ticket_name')) {
+
+                foreach ($request->ticket_name as $index => $name) {
+
+                    TicketType::create([
+                     'event_id' => $event->id,
+                     'name' => $name,
+                     'price' => $request->ticket_type_price[$index],
+                     'quota' => $request->ticket_type_quota[$index],
+                     'sold' => 0,
+                     'status' => 'active',
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Event created successfully',
+                'data' => $event
+            ], 201);
         
     }
 
 
-
+    //Edit Event
     public function update(Request $request, $id)
     {
         $event = Event::find($id);
 
-        if (!$event) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Event not found'
-            ], 404);
-        }
+            if (!$event) {
+                return response()->json([
+                 'success' => false,
+                 'message' => 'Event not found'
+                ], 404);
+            }
 
         $validated = $request->validate([
             'title' => 'sometimes|max:150',
@@ -127,6 +153,8 @@ if ($request->hasFile('gallery')) {
         ]);
     }
 
+
+    //Hapus event
     public function destroy($id)
     {
         $event = Event::find($id);
@@ -146,6 +174,7 @@ if ($request->hasFile('gallery')) {
         ]);
     }
 
+    //Approve Event
     public function approve($id)
     {
         $event = Event::findOrFail($id);
@@ -161,6 +190,7 @@ if ($request->hasFile('gallery')) {
         ]);
     }
 
+    //Reject event
     public function reject($id)
     {
         $event = Event::findOrFail($id);

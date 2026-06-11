@@ -4,7 +4,6 @@
 <head>
     <title>Test Event CRUD</title>
 
-```
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -33,7 +32,6 @@
         vertical-align: top;
     }
 </style>
-```
 
 </head>
 <body>
@@ -55,7 +53,6 @@
       method="POST"
       enctype="multipart/form-data">
 
-```
 @csrf
 
 <div>
@@ -221,11 +218,59 @@
 <div id="preview" class="preview"></div>
 
 <br>
+<h3>Ticket Types</h3>
+
+<div id="ticket-container">
+
+    <div class="ticket-item" style="border:1px solid #ccc;padding:10px;margin-bottom:10px;">
+
+        <div>
+            <label>Ticket Name</label><br>
+            <input type="text" name="ticket_name[]" required>
+        </div>
+
+        <br>
+
+        <div>
+            <label>Price</label><br>
+            <input type="number" name="ticket_type_price[]" min="0" required>
+        </div>
+
+        <br>
+
+        <div>
+            <label>Quota</label><br>
+            <input type="number" name="ticket_type_quota[]" min="1" required>
+        </div>
+
+        <br>
+
+        <div>
+            <label>Start Sale</label><br>
+            <input type="datetime-local" name="start_sale[]" required>
+        </div>
+
+        <br>
+
+        <div>
+            <label>End Sale</label><br>
+            <input type="datetime-local" name="end_sale[]" required>
+        </div>
+
+    </div>
+
+</div>
+
+<button type="button" onclick="addTicketType()">
+    + Tambah Ticket Type
+</button>
+
+<br><br>
 
 <button type="submit">
     Create Event
 </button>
-```
+
 
 </form>
 
@@ -235,13 +280,14 @@
 
 <table>
 
-```
 <tr>
     <th>ID</th>
     <th>Title</th>
     <th>Poster</th>
     <th>Gallery</th>
+    <th>Kategori Tiket</th>
     <th>Status</th>
+    <th>Action</th>
 </tr>
 
 @foreach($events as $event)
@@ -279,13 +325,48 @@
         @endforeach
 
     </td>
+    <td>
+
+    @foreach($event->ticketTypes as $ticket)
+
+        <div>
+            <b>{{ $ticket->name }}</b><br>
+            Harga:
+            Rp {{ number_format($ticket->price) }}<br>
+
+            Kuota:
+            {{ $ticket->quota }}
+        </div>
+
+        <hr>
+
+    @endforeach
+
+</td>
 
     <td>{{ $event->status }}</td>
+    <td>
+
+    <br><br>
+
+    <form action="{{ route('event.destroy',$event->id) }}"
+          method="POST">
+
+        @csrf
+        @method('DELETE')
+
+        <button type="submit">
+            Delete
+        </button>
+
+    </form>
+
+</td>
 
 </tr>
 
 @endforeach
-```
+
 
 </table>
 
@@ -320,6 +401,77 @@ document.getElementById('galleryInput')
     });
 
 });
+
+</script>
+<script>
+
+function addTicketType()
+{
+    const container =
+        document.getElementById('ticket-container');
+
+    container.insertAdjacentHTML(
+        'beforeend',
+        `
+        <div class="ticket-item"
+             style="border:1px solid #ccc;padding:10px;margin-bottom:10px;">
+
+            <div>
+                <label>Ticket Name</label><br>
+                <input type="text"
+                       name="ticket_name[]"
+                       required>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Price</label><br>
+                <input type="number"
+                       name="ticket_type_price[]"
+                       min="0"
+                       required>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Quota</label><br>
+                <input type="number"
+                       name="ticket_type_quota[]"
+                       min="1"
+                       required>
+            </div>
+
+            <br>
+
+            <div>
+                <label>Start Sale</label><br>
+                <input type="datetime-local"
+                       name="start_sale[]"
+                       required>
+            </div>
+
+            <br>
+
+            <div>
+                <label>End Sale</label><br>
+                <input type="datetime-local"
+                       name="end_sale[]"
+                       required>
+            </div>
+
+            <br>
+
+            <button type="button"
+                    onclick="this.parentElement.remove()">
+                Hapus Ticket Type
+            </button>
+
+        </div>
+        `
+    );
+}
 
 </script>
 
