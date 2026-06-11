@@ -6,24 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('metode_pembayaran', function (Blueprint $table) {
+        Schema::create('event_galleries', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_metode', 50);
-            $table->boolean('is_aktif')->default(true);
+
+            $table->foreignId('event_id')
+                  ->constrained('events')
+                  ->onDelete('cascade');
+
+            $table->string('image_path');
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('metode_pembayaran');
+        Schema::dropIfExists('event_galleries');
     }
 };
