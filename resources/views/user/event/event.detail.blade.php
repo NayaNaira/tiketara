@@ -42,37 +42,20 @@
 </header>
 
     <section
-    class="relative
-           bg-gradient-to-r
-           from-[#041830]
-           to-[#2D4F78]
-           pt-24
-           pb-6">
-
+        class="relative bg-gradient-to-r from-[#041830] to-[#2D4F78] pt-24 pb-6">
     <div class="max-w-6xl mx-auto px-8">
-
         <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
-
            <!-- KIRI -->
 <div class="w-full lg:w-[55%]">
 
     <!-- Back -->
     <a href="#"
-       class="inline-flex items-center gap-2
-              text-white text-xs font-semibold
-              uppercase tracking-wider
-              hover:text-[#C9A84C] mb-8">
-
+       class="inline-flex items-center gap-2 text-white text-xs font-semibold uppercase tracking-wider hover:text-[#C9A84C] mb-8">
     </a>
 
     <!-- Label -->
     <div
-        class="flex gap-6
-               text-[11px]
-               font-semibold
-               uppercase
-               tracking-[2px]
-               mb-4">
+        class="flex gap-6 text-[11px] font-semibold uppercase tracking-[2px] mb-4">
 
         <span class="text-[#C9A84C]">
             SOS WORLD TOUR
@@ -86,11 +69,7 @@
 
     <!-- Judul -->
     <h1
-        class="text-white
-               text-5xl
-               md:text-6xl
-               font-light
-               leading-none">
+        class="text-white text-5xl md:text-6xl font-light leading-none">
 
         SZA
         <span class="text-[#C9A84C]">
@@ -100,47 +79,24 @@
     </h1>
 
     <h2
-        class="text-white
-               text-5xl
-               md:text-6xl
-               font-light
-               leading-none mt-1">
-
+        class="text-white text-5xl md:text-6xl font-light leading-none mt-1">
         JAKARTA
-
     </h2>
 
     <!-- Lokasi -->
     <p
-        class="mt-2
-               text-[#4A9FD4]
-               text-sm
-               uppercase
-               tracking-[5px]
-               font-semibold">
-
+        class="mt-2 text-[#4A9FD4] text-sm uppercase tracking-[5px] font-semibold">
         INDONESIA ARENA
-
     </p>
 
     <!-- Informasi -->
     <div
-        class="grid
-               grid-cols-2
-               sm:grid-cols-4
-               gap-4
-               mt-8">
+        class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
 
         <div>
 
-            <p
-                class="text-[#4A9FD4]
-                       text-[10px]
-                       uppercase
-                       tracking-wider">
-
+            <p class="text-[#4A9FD4] text-[10px] uppercase tracking-wider">
                 TANGGAL
-
             </p>
 
             <p class="text-white text-sm mt-1">
@@ -151,14 +107,8 @@
 
         <div>
 
-            <p
-                class="text-[#4A9FD4]
-                       text-[10px]
-                       uppercase
-                       tracking-wider">
-
+            <p class="text-[#4A9FD4] text-[10px] uppercase tracking-wider">
                 BUKA PINTU
-
             </p>
 
             <p class="text-white text-sm mt-1">
@@ -169,14 +119,8 @@
 
         <div>
 
-            <p
-                class="text-[#4A9FD4]
-                       text-[10px]
-                       uppercase
-                       tracking-wider">
-
+            <p class="text-[#4A9FD4] text-[10px] uppercase tracking-wider">
                 SHOW START
-
             </p>
 
             <p class="text-white text-sm mt-1">
@@ -188,13 +132,8 @@
         <div>
 
             <p
-                class="text-[#4A9FD4]
-                       text-[10px]
-                       uppercase
-                       tracking-wider">
-
+                class="text-[#4A9FD4] text-[10px] uppercase tracking-wider">
                 USIA
-
             </p>
 
             <p class="text-white text-sm mt-1">

@@ -45,7 +45,7 @@
 
 
             <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Nama *</label>
+                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Nama</label>
                 <input 
                     type="text" 
                     name="name" 
@@ -57,7 +57,7 @@
             </div>
 
             <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Email *</label>
+                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Email</label>
                 <input 
                     type="email" 
                     name="email" 
@@ -71,7 +71,7 @@
                 <div class="mb-5">
 
                     <label class="block text-[#4A9FD4] text-sm mb-2">
-                        Nama *
+                        Nama
                     </label>
 
                     <input
@@ -88,7 +88,7 @@
 
 
             <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Password *</label>
+                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Password</label>
                 <div class="relative">
                     <input 
                         type="password" 
@@ -107,7 +107,7 @@
                 <div class="mb-5">
 
                     <label class="block text-[#4A9FD4] text-sm mb-2">
-                        Email *
+                        Email
                     </label>
 
                     <input
@@ -140,7 +140,7 @@
                 <div class="mb-8">
 
                     <label class="block text-[#4A9FD4] text-sm mb-2">
-                        Konfirmasi Password *
+                        Konfirmasi Password
                     </label>
 
                     <div class="relative">
