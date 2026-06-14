@@ -29,6 +29,15 @@ return new class extends Migration
         'attraction_tourism'
      ]);
 
+     // Rating Umur
+     $table->enum('age_rating', [
+       'all_ages',
+       '13_plus',
+       '17_plus',
+       '18_plus',
+       '21_plus'
+     ])->default('all_ages');
+
      // Lokasi
      $table->string('venue_name');
      $table->text('address');
@@ -39,10 +48,9 @@ return new class extends Migration
       $table->time('start_time');
      $table->time('end_time')->nullable();
 
-     // Tiket
-      $table->decimal('ticket_price', 12, 2);
-     $table->integer('ticket_quota');
-     $table->integer('tickets_sold')->default(0);
+     // Maksimal tiket per order
+     $table->unsignedInteger('max_ticket_per_order')
+      ->default(5);
 
      // Media
      $table->string('poster_path');

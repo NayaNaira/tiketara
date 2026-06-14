@@ -3,30 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\EventGallery;
 use App\Models\TicketType;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
+    // =========================
+    // INDEX
+    // =========================
     public function index()
     {
-        $events = Event::with([
-         'galleries',
-         'ticketTypes'
-        ])->latest()->get();
+        $events = Event::with(['galleries', 'ticketTypes'])
+            ->latest()
+            ->get();
 
         return view('event', compact('events'));
-        return response()->json([
-            'success' => true,
-            'data' => Event::all()
-        ]);
     }
-    //Tayangkan detail event
+
+    // =========================
+    // SHOW (API)
+    // =========================
     public function show($id)
     {
-        $event = Event::find($id);
+        $event = Event::with(['galleries', 'ticketTypes'])->find($id);
 
         if (!$event) {
             return response()->json([
@@ -41,11 +44,12 @@ class EventController extends Controller
         ]);
     }
 
-
-    //Simpan event
+    // =========================
+    // STORE EVENT
+    // =========================
     public function store(Request $request)
     {
-       $validated = $request->validate([
+        $validated = $request->validate([
             'title' => 'required|max:150',
             'description' => 'required',
             'category' => 'required',
@@ -58,115 +62,192 @@ class EventController extends Controller
             'start_time' => 'required',
             'end_time' => 'required',
 
-            'ticket_price' => 'required|numeric|min:0',
-            'ticket_quota' => 'required|integer|min:1',
-
+            'max_ticket_per_order' => 'required|integer|min:1',
             'terms_and_conditions' => 'required',
 
-            'poster' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'poster' => 'required|image|max:2048',
 
             'gallery' => 'nullable|array',
-            'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'gallery.*' => 'image|max:2048',
 
-            'ticket_name.*' => 'required|string|max:100',
-            'ticket_type_price.*' => 'required|numeric|min:0',
-            'ticket_type_quota.*' => 'required|integer|min:1',
+            'ticket_name' => 'required|array',
+            'ticket_name.*' => 'required|string',
 
-       ]);
+            'ticket_type_price' => 'required|array',
+            'ticket_type_price.*' => 'required|numeric',
 
-        $posterPath = $request->file('poster')
-                    ->store('events/posters', 'public');
+            'ticket_type_quota' => 'required|array',
+            'ticket_type_quota.*' => 'required|integer',
 
-        $validated['promoter_id'] = Auth::id();
-        $validated['poster_path'] = $posterPath;
+            'start_sale' => 'required|array',
+            'end_sale' => 'required|array',
+        ]);
 
-        $event = Event::create($validated);
-            //Simpan Gallery
+        DB::transaction(function () use ($request, $validated) {
+
+            // poster
+            $posterPath = $request->file('poster')
+                ->store('events/posters', 'public');
+
+            $validated['poster_path'] = $posterPath;
+            $validated['promoter_id'] = Auth::id();
+
+            // create event
+            $event = Event::create($validated);
+
+            // gallery
             if ($request->hasFile('gallery')) {
-
                 foreach ($request->file('gallery') as $image) {
-
-                $path = $image->store('events/gallery', 'public');
+                    $path = $image->store('events/gallery', 'public');
 
                     EventGallery::create([
-                     'event_id' => $event->id,
-                     'image_path' => $path,
+                        'event_id' => $event->id,
+                        'image_path' => $path,
                     ]);
                 }
             }
 
-            //Simpan Tipe/Kategori Tiket
-            if ($request->filled('ticket_name')) {
-
-                foreach ($request->ticket_name as $index => $name) {
-
-                    TicketType::create([
-                     'event_id' => $event->id,
-                     'name' => $name,
-                     'price' => $request->ticket_type_price[$index],
-                     'quota' => $request->ticket_type_quota[$index],
-                     'sold' => 0,
-                     'status' => 'active',
-                    ]);
-                }
+            // ticket types
+            foreach ($request->ticket_name as $i => $name) {
+                TicketType::create([
+                    'event_id' => $event->id,
+                    'name' => $name,
+                    'price' => $request->ticket_type_price[$i],
+                    'quota' => $request->ticket_type_quota[$i],
+                    'sold' => 0,
+                    'start_sale' => $request->start_sale[$i],
+                    'end_sale' => $request->end_sale[$i],
+                    'status' => 'active',
+                ]);
             }
+        });
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Event created successfully',
-                'data' => $event
-            ], 201);
-        
+        return response()->json([
+            'success' => true,
+            'message' => 'Event created successfully'
+        ], 201);
     }
 
+    // =========================
+    // EDIT PAGE
+    // =========================
+    public function edit($id)
+    {
+        $events = Event::with(['galleries', 'ticketTypes'])
+            ->latest()
+            ->get();
 
-    //Edit Event
+        $editEvent = Event::with(['galleries', 'ticketTypes'])
+            ->findOrFail($id);
+
+        return view('event', compact('events', 'editEvent'));
+    }
+
+    // =========================
+    // UPDATE EVENT
+    // =========================
     public function update(Request $request, $id)
     {
-        $event = Event::find($id);
-
-            if (!$event) {
-                return response()->json([
-                 'success' => false,
-                 'message' => 'Event not found'
-                ], 404);
-            }
+        $event = Event::findOrFail($id);
 
         $validated = $request->validate([
             'title' => 'sometimes|max:150',
             'description' => 'sometimes',
-            'ticket_price' => 'sometimes|numeric|min:0',
-            'category' => 'sometimes|max:100',
-            'ticket_quota' => 'sometimes|integer|min:1',
-            'max_ticket_per_order' => 'required|integer|min:1',
-            'poster_path' => 'sometimes|string',
+            'category' => 'sometimes',
+            'max_ticket_per_order' => 'sometimes|integer|min:1',
             'terms_and_conditions' => 'sometimes',
             'status' => 'sometimes|in:pending,approved,rejected',
         ]);
 
-        $event->update($validated);
+        DB::transaction(function () use ($request, $event, $validated) {
+
+            // update event basic data
+            $event->update($validated);
+
+            // =========================
+            // POSTER UPDATE
+            // =========================
+            if ($request->hasFile('poster')) {
+
+                if ($event->poster_path) {
+                    Storage::disk('public')->delete($event->poster_path);
+                }
+
+                $path = $request->file('poster')
+                    ->store('events/posters', 'public');
+
+                $event->update([
+                    'poster_path' => $path
+                ]);
+            }
+
+            // =========================
+            // GALLERY (ADD ONLY)
+            // =========================
+            if ($request->hasFile('gallery')) {
+                foreach ($request->file('gallery') as $file) {
+                    $path = $file->store('events/gallery', 'public');
+
+                    EventGallery::create([
+                        'event_id' => $event->id,
+                        'image_path' => $path
+                    ]);
+                }
+            }
+
+            // =========================
+            // TICKET TYPES (REPLACE MODE)
+            // =========================
+            TicketType::where('event_id', $event->id)->delete();
+
+            if ($request->filled('ticket_name')) {
+                foreach ($request->ticket_name as $i => $name) {
+                    TicketType::create([
+                        'event_id' => $event->id,
+                        'name' => $name,
+                        'price' => $request->ticket_type_price[$i],
+                        'quota' => $request->ticket_type_quota[$i],
+                        'start_sale' => $request->start_sale[$i],
+                        'end_sale' => $request->end_sale[$i],
+                        'sold' => 0,
+                        'status' => 'active',
+                    ]);
+                }
+            }
+        });
 
         return response()->json([
             'success' => true,
-            'message' => 'Event updated successfully',
-            'data' => $event
+            'message' => 'Event updated successfully'
         ]);
     }
 
-
-    //Hapus event
+    // =========================
+    // DELETE EVENT
+    // =========================
     public function destroy($id)
     {
-        $event = Event::find($id);
+        $event = Event::findOrFail($id);
 
-        if (!$event) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Event not found'
-            ], 404);
-        }
+        DB::transaction(function () use ($event) {
 
-        $event->delete();
+            // delete poster
+            if ($event->poster_path) {
+                Storage::disk('public')->delete($event->poster_path);
+            }
+
+            // delete gallery files + db
+            foreach ($event->galleries as $gallery) {
+                Storage::disk('public')->delete($gallery->image_path);
+                $gallery->delete();
+            }
+
+            // delete ticket types
+            TicketType::where('event_id', $event->id)->delete();
+
+            // delete event
+            $event->delete();
+        });
 
         return response()->json([
             'success' => true,
@@ -174,7 +255,9 @@ class EventController extends Controller
         ]);
     }
 
-    //Approve Event
+    // =========================
+    // APPROVE
+    // =========================
     public function approve($id)
     {
         $event = Event::findOrFail($id);
@@ -185,12 +268,13 @@ class EventController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Event approved successfully',
-            'data' => $event
+            'message' => 'Event approved successfully'
         ]);
     }
 
-    //Reject event
+    // =========================
+    // REJECT
+    // =========================
     public function reject($id)
     {
         $event = Event::findOrFail($id);
@@ -201,9 +285,23 @@ class EventController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Event rejected successfully',
-            'data' => $event
+            'message' => 'Event rejected successfully'
         ]);
     }
 
+    // =========================
+    // DELETE SINGLE GALLERY
+    // =========================
+    public function deleteGallery($id)
+    {
+        $gallery = EventGallery::findOrFail($id);
+
+        Storage::disk('public')->delete($gallery->image_path);
+
+        $gallery->delete();
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
 }

@@ -71,7 +71,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/promoter', fn () => view('promoter.dashboard'))
+Route::get('/promoter', fn () => view('.dashboard'))
     ->middleware(['auth', 'role:promoter,super_admin']);
 
 Route::prefix('super')->middleware(['auth', 'role:super_admin'])->group(function () {
@@ -99,6 +99,9 @@ Route::get('/event', [EventController::class, 'index'])
 Route::post('/event', [EventController::class, 'store'])
     ->name('event.store');
 
+Route::post('/event/{id}/submit', [EventController::class, 'submit'])
+    ->name('event.submit');
+
 Route::get('/event/{id}/edit', [EventController::class, 'edit'])
     ->name('event.edit');
 
@@ -113,6 +116,8 @@ Route::post('/event/{event}/gallery', [EventGalleryController::class, 'store'])
 
 Route::delete('/event/{event}/gallery/{gallery}', [EventGalleryController::class, 'destroy'])
     ->middleware(['auth', 'role:promoter']);
+
+Route::delete('/gallery/{id}', [EventController::class, 'deleteGallery']);
 
 Route::get('/ticket-types', [TicketTypeController::class, 'index'])
     ->name('ticket-types.index');
