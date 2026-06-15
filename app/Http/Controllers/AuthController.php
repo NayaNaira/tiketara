@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\MustVerifyEmail;
 
 class AuthController extends Controller
 {
@@ -55,7 +54,7 @@ class AuthController extends Controller
     // redirect berdasarkan role
     return match ($user->role) {
         'super_admin' => redirect('/super'),
-        'promotor' => redirect('/promotor'),
+        'promoter' => redirect('/promoter'),
         default => redirect('/dashboard'),
     };
 }
@@ -85,7 +84,7 @@ class AuthController extends Controller
         $user = User::create([
          'name' => $request->name,
          'email' => $request->email,
-         'role' => 'pembeli',
+         'role' => 'buyer',
          'status' => 'verify',
          'password' => Hash::make($request->password),
         ]);
