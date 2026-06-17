@@ -48,8 +48,8 @@
         </div>
     </div>
 
-        <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 overflow-hidden">
-        <table class="w-full text-left text-sm">
+        <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
             <thead class="text-[#4A9FD4] border-b border-[#4A9FD4]/30">
                 <tr>
                     <th class="px-6 py-4 font-medium">No</th>
@@ -66,7 +66,7 @@
             <tbody class="divide-y divide-[#202020]">
                                 <tr class="hover:bg-white/5 transition">
                     <td class="px-6 py-4 text-[#DADADA]">1</td>
-                    <td class="px-6 py-4 font-medium text-white">SZA SOS World Tour 2026</td>
+                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 1) }}" class="hover:underline hover:text-[#C9A84C] transition">SZA SOS World Tour 2026</a></td>
                     <td class="px-6 py-4 text-[#DADADA]">14 JULI 2026<br><span class="text-xs">19:30 WIB</span></td>
                     <td class="px-6 py-4 text-[#DADADA]">GBK, Jakarta</td>
                     <td class="px-6 py-4 text-[#DADADA]">R&B</td>
@@ -88,7 +88,7 @@
                 </tr>
                                 <tr class="hover:bg-white/5 transition">
                     <td class="px-6 py-4 text-[#DADADA]">2</td>
-                    <td class="px-6 py-4 font-medium text-white">YUNG KAI World Tour 2026</td>
+                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 2) }}" class="hover:underline hover:text-[#C9A84C] transition">YUNG KAI World Tour 2026</a></td>
                     <td class="px-6 py-4 text-[#DADADA]">21 JULI 2026<br><span class="text-xs">20:30 WIB</span></td>
                     <td class="px-6 py-4 text-[#DADADA]">Senayan, Jakarta</td>
                     <td class="px-6 py-4 text-[#DADADA]">Indie POP</td>
@@ -110,7 +110,7 @@
                 </tr>
                                 <tr class="hover:bg-white/5 transition">
                     <td class="px-6 py-4 text-[#DADADA]">3</td>
-                    <td class="px-6 py-4 font-medium text-white">Dewa 19 Reunion Concert</td>
+                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 3) }}" class="hover:underline hover:text-[#C9A84C] transition">Dewa 19 Reunion Concert</a></td>
                     <td class="px-6 py-4 text-[#DADADA]">18 AGUST 2026<br><span class="text-xs">14:00 WIB</span></td>
                     <td class="px-6 py-4 text-[#DADADA]">JIEXPO, Jakarta</td>
                     <td class="px-6 py-4 text-[#DADADA]">POP/ROCK</td>
@@ -132,7 +132,7 @@
                 </tr>
                                 <tr class="hover:bg-white/5 transition">
                     <td class="px-6 py-4 text-[#DADADA]">4</td>
-                    <td class="px-6 py-4 font-medium text-white">BTS Permission To Dance</td>
+                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 4) }}" class="hover:underline hover:text-[#C9A84C] transition">BTS Permission To Dance</a></td>
                     <td class="px-6 py-4 text-[#DADADA]">10 MAR 2026<br><span class="text-xs">18:30 WIB</span></td>
                     <td class="px-6 py-4 text-[#DADADA]">GBK, Jakarta</td>
                     <td class="px-6 py-4 text-[#DADADA]">K-POP</td>
@@ -154,7 +154,7 @@
                 </tr>
                                 <tr class="hover:bg-white/5 transition">
                     <td class="px-6 py-4 text-[#DADADA]">5</td>
-                    <td class="px-6 py-4 font-medium text-white">Maliq & D'Essentials</td>
+                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 5) }}" class="hover:underline hover:text-[#C9A84C] transition">Maliq & D'Essentials</a></td>
                     <td class="px-6 py-4 text-[#DADADA]">8 FEB 2026<br><span class="text-xs">16:00 WIB</span></td>
                     <td class="px-6 py-4 text-[#DADADA]">Senayan, Jakarta</td>
                     <td class="px-6 py-4 text-[#DADADA]">Jazz/Soul</td>

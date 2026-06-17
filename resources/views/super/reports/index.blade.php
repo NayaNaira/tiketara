@@ -48,8 +48,8 @@
         </div>
     </div>
 
-        <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 overflow-hidden">
-        <table class="w-full text-left text-sm">
+        <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
             <thead class="text-[#4A9FD4] border-b border-[#4A9FD4]/30">
                 <tr>
                     <th class="px-6 py-4 font-medium">No</th>

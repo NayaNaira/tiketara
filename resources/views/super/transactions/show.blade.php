@@ -2,9 +2,14 @@
 @section('title', 'Detail Transaksi')
 
 @section('content')
-<header class="p-8 pb-4">
-    <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Detail Transaksi - #07483648</h1>
-    <p class="text-sm text-[#4A9FD4]">Kelola semua transaksi yang masuk di platform</p>
+<header class="p-8 pb-4 flex items-center gap-4">
+    <a href="{{ url()->previous() }}" class="w-10 h-10 rounded-full bg-[#041830] border border-[#202020] flex items-center justify-center text-[#DADADA] hover:bg-white/10 transition shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    </a>
+    <div>
+        <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Detail Transaksi - #07483648</h1>
+        <p class="text-sm text-[#4A9FD4]">Kelola semua transaksi yang masuk di platform</p>
+    </div>
 </header>
 
 <div class="flex-1 p-8 pt-0 overflow-y-auto space-y-6">
