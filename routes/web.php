@@ -79,6 +79,7 @@ Route::prefix('super')->middleware(['auth', 'role:super_admin'])->group(function
     Route::get('/summary', [App\Http\Controllers\SuperAdminController::class, 'summary'])->name('super.summary');
     Route::get('/events/{id}', [App\Http\Controllers\SuperAdminController::class, 'eventDetail'])->name('super.events.show');
     Route::get('/transactions', [App\Http\Controllers\SuperAdminController::class, 'transactions'])->name('super.transactions.index');
+    Route::get('/transactions/event/{id}', [App\Http\Controllers\SuperAdminController::class, 'transactionEventList'])->name('super.transactions.list');
     Route::get('/transactions/{id}', [App\Http\Controllers\SuperAdminController::class, 'transactionDetail'])->name('super.transactions.show');
     Route::get('/reports', [App\Http\Controllers\SuperAdminController::class, 'reports'])->name('super.reports.index');
     Route::get('/export', [App\Http\Controllers\SuperAdminController::class, 'export'])->name('super.export');

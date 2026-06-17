@@ -34,8 +34,13 @@ class SuperAdminController extends Controller
 
     public function transactions()
     {
-        $transactions = [];
-        return view('super.transactions.index', compact('transactions'));
+        $events = Event::orderBy('created_at', 'desc')->get();
+        return view('super.transactions.index', compact('events'));
+    }
+
+    public function transactionEventList($id)
+    {
+        return view('super.transactions.list', compact('id'));
     }
 
     public function transactionDetail($id)

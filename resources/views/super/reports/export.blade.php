@@ -11,7 +11,7 @@
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-                <div class="lg:col-span-5 bg-[#041830] rounded-xl border border-[#4A9FD4]/30 p-6 flex flex-col h-[calc(100vh-140px)] min-h-[600px]">
+                <div class="lg:col-span-5 bg-[#041830] rounded-xl border border-[#4A9FD4]/30 p-6 flex flex-col h-full">
             <h3 class="text-white font-bold mb-1">Konfigurasi Laporan</h3>
             <p class="text-[10px] text-gray-400 mb-6">Atur isi dan format laporan PDF yang akan digenerate</p>
             

@@ -3,9 +3,14 @@
 
 @section('content')
 <header class="p-8 pb-4 flex justify-between items-center border-b border-[#202020] bg-[#020D1A] sticky top-0 z-10">
-    <div>
-        <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Detail Acara - {{ $event->title }}</h1>
-        <p class="text-sm text-[#4A9FD4]">Kelola semua acara yang terdaftar di platform</p>
+    <div class="flex items-center gap-4">
+        <a href="{{ url()->previous() }}" class="w-10 h-10 rounded-full bg-[#041830] border border-[#202020] flex items-center justify-center text-[#DADADA] hover:bg-white/10 transition shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </a>
+        <div>
+            <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Detail Acara - {{ $event->title }}</h1>
+            <p class="text-sm text-[#4A9FD4]">Kelola semua acara yang terdaftar di platform</p>
+        </div>
     </div>
     <div class="flex gap-3">
         <button class="bg-white border border-gray-300 text-red-500 hover:bg-red-50 text-sm font-semibold py-2 px-6 rounded-md transition flex items-center gap-2">

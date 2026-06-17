@@ -21,10 +21,8 @@
                 $currentRoute = request()->route()->getName();
                 
                 $navItems = [
-                    ['route' => 'super.events.index', 'label' => 'Daftar Acara', 'active' => str_starts_with($currentRoute, 'super.events') && $currentRoute != 'super.events.show'],
-                    ['route' => 'super.events.show', 'params' => 1, 'label' => 'Detail Acara', 'active' => $currentRoute == 'super.events.show'],
-                    ['route' => 'super.transactions.index', 'label' => 'Daftar Transaksi', 'active' => str_starts_with($currentRoute, 'super.transactions') && $currentRoute != 'super.transactions.show'],
-                    ['route' => 'super.transactions.show', 'params' => 1, 'label' => 'Detail Transaksi', 'active' => $currentRoute == 'super.transactions.show'],
+                    ['route' => 'super.events.index', 'label' => 'Daftar Acara', 'active' => str_starts_with($currentRoute, 'super.events')],
+                    ['route' => 'super.transactions.index', 'label' => 'Daftar Transaksi', 'active' => str_starts_with($currentRoute, 'super.transactions')],
                     ['route' => 'super.summary', 'label' => 'Ringkasan', 'active' => $currentRoute == 'super.summary'],
                     ['route' => 'super.reports.index', 'label' => 'Laporan', 'active' => str_starts_with($currentRoute, 'super.reports') && $currentRoute != 'super.export'],
                     ['route' => 'super.export', 'label' => 'Export Laporan', 'active' => $currentRoute == 'super.export'],
