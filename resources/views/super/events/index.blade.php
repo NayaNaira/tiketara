@@ -8,48 +8,41 @@
 </header>
 
 <div class="flex-1 p-8 pt-0 overflow-y-auto">
-    
-        <div class="flex flex-wrap gap-4 mb-6 items-center">
+    <div class="flex flex-wrap gap-4 mb-6 items-center">
         <div class="relative flex-1 min-w-[200px]">
-            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" placeholder="Cari nama acara..." class="w-full bg-white text-black text-sm rounded-md py-2 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C]">
+            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama acara atau kota..." class="w-full bg-white text-black text-sm rounded-md py-2 pl-9 pr-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C]">
         </div>
         
-        <select class="bg-white text-black text-sm rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] cursor-pointer appearance-none pr-8 relative">
-            <option>Status: Semua</option>
-            <option>Publish</option>
-            <option>Draft</option>
-            <option>Selesai</option>
+        <select id="statusFilter" onchange="filterTable()" class="bg-white text-black text-sm rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] cursor-pointer appearance-none pr-8">
+            <option value="">Status: Semua</option>
+            <option value="APPROVED">Approved</option>
+            <option value="PENDING">Pending</option>
+            <option value="REJECTED">Ditolak</option>
         </select>
 
-        <select class="bg-white text-black text-sm rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] cursor-pointer appearance-none pr-8">
-            <option>Kategori: Semua</option>
-            <option>Konser</option>
-            <option>Festival</option>
+        <select id="categoryFilter" onchange="filterTable()" class="bg-white text-black text-sm rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] cursor-pointer appearance-none pr-8">
+            <option value="">Kategori: Semua</option>
+            @php 
+                $categories = $events->pluck('category')->unique(); 
+            @endphp
+            @foreach($categories as $cat)
+                <option value="{{ strtoupper($cat) }}">{{ $cat }}</option>
+            @endforeach
         </select>
 
         <div class="bg-white text-black text-sm rounded-md py-2 px-4 flex items-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span>Jan 2026 - Des 2026</span>
-        </div>
-
-        <select class="bg-white text-black text-sm rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-[#C9A84C] cursor-pointer appearance-none pr-8">
-            <option>Urutkan: Terbaru</option>
-            <option>Terlama</option>
-        </select>
-        
-        <div class="flex bg-white rounded-md overflow-hidden">
-            <button class="px-3 py-2 bg-gray-100 text-black border-r border-gray-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            </button>
-            <button class="px-3 py-2 text-gray-500 hover:bg-gray-50">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
+            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <span>Periode Aktif: 2026</span>
         </div>
     </div>
 
-        <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap min-w-max">
+    <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap min-w-max" id="eventTable">
             <thead class="text-[#4A9FD4] border-b border-[#4A9FD4]/30">
                 <tr>
                     <th class="px-6 py-4 font-medium">No</th>
@@ -64,118 +57,161 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-[#202020]">
-                                <tr class="hover:bg-white/5 transition">
-                    <td class="px-6 py-4 text-[#DADADA]">1</td>
-                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 1) }}" class="hover:underline hover:text-[#C9A84C] transition">SZA SOS World Tour 2026</a></td>
-                    <td class="px-6 py-4 text-[#DADADA]">14 JULI 2026<br><span class="text-xs">19:30 WIB</span></td>
-                    <td class="px-6 py-4 text-[#DADADA]">GBK, Jakarta</td>
-                    <td class="px-6 py-4 text-[#DADADA]">R&B</td>
-                    <td class="px-6 py-4 text-[#DADADA]">18,420/25,000</td>
-                    <td class="px-6 py-4 text-[#DADADA]">Rp 10.5M</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-[#4A9FD4] text-[#4A9FD4] text-xs font-bold bg-[#4A9FD4]/10 uppercase">PUBLISH</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </button>
-                            <button class="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-50 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                                <tr class="hover:bg-white/5 transition">
-                    <td class="px-6 py-4 text-[#DADADA]">2</td>
-                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 2) }}" class="hover:underline hover:text-[#C9A84C] transition">YUNG KAI World Tour 2026</a></td>
-                    <td class="px-6 py-4 text-[#DADADA]">21 JULI 2026<br><span class="text-xs">20:30 WIB</span></td>
-                    <td class="px-6 py-4 text-[#DADADA]">Senayan, Jakarta</td>
-                    <td class="px-6 py-4 text-[#DADADA]">Indie POP</td>
-                    <td class="px-6 py-4 text-[#DADADA]">10,400/15,000</td>
-                    <td class="px-6 py-4 text-[#DADADA]">Rp 8M</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-[#4A9FD4] text-[#4A9FD4] text-xs font-bold bg-[#4A9FD4]/10 uppercase">PUBLISH</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </button>
-                            <button class="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-50 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                                <tr class="hover:bg-white/5 transition">
-                    <td class="px-6 py-4 text-[#DADADA]">3</td>
-                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 3) }}" class="hover:underline hover:text-[#C9A84C] transition">Dewa 19 Reunion Concert</a></td>
-                    <td class="px-6 py-4 text-[#DADADA]">18 AGUST 2026<br><span class="text-xs">14:00 WIB</span></td>
-                    <td class="px-6 py-4 text-[#DADADA]">JIEXPO, Jakarta</td>
-                    <td class="px-6 py-4 text-[#DADADA]">POP/ROCK</td>
-                    <td class="px-6 py-4 text-[#DADADA]">0/12,000</td>
-                    <td class="px-6 py-4 text-[#DADADA]">-</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-[#C9A84C] text-[#C9A84C] text-xs font-bold bg-[#C9A84C]/10 uppercase">DRAFT</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </button>
-                            <button class="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-50 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                                <tr class="hover:bg-white/5 transition">
-                    <td class="px-6 py-4 text-[#DADADA]">4</td>
-                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 4) }}" class="hover:underline hover:text-[#C9A84C] transition">BTS Permission To Dance</a></td>
-                    <td class="px-6 py-4 text-[#DADADA]">10 MAR 2026<br><span class="text-xs">18:30 WIB</span></td>
-                    <td class="px-6 py-4 text-[#DADADA]">GBK, Jakarta</td>
-                    <td class="px-6 py-4 text-[#DADADA]">K-POP</td>
-                    <td class="px-6 py-4 text-[#DADADA]">50,000/50,000</td>
-                    <td class="px-6 py-4 text-[#DADADA]">Rp 300M</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-green-500 text-green-500 text-xs font-bold bg-green-500/10 uppercase">SELESAI</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </button>
-                            <button class="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-50 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                                <tr class="hover:bg-white/5 transition">
-                    <td class="px-6 py-4 text-[#DADADA]">5</td>
-                    <td class="px-6 py-4 font-medium text-white"><a href="{{ route('super.events.show', 5) }}" class="hover:underline hover:text-[#C9A84C] transition">Maliq & D'Essentials</a></td>
-                    <td class="px-6 py-4 text-[#DADADA]">8 FEB 2026<br><span class="text-xs">16:00 WIB</span></td>
-                    <td class="px-6 py-4 text-[#DADADA]">Senayan, Jakarta</td>
-                    <td class="px-6 py-4 text-[#DADADA]">Jazz/Soul</td>
-                    <td class="px-6 py-4 text-[#DADADA]">24,000/25,000</td>
-                    <td class="px-6 py-4 text-[#DADADA]">Rp 5M</td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-green-500 text-green-500 text-xs font-bold bg-green-500/10 uppercase">SELESAI</span>
-                    </td>
-                    <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2">
-                            <button class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </button>
-                            <button class="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-50 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                @forelse ($events as $index => $event)
+                    @php
+                        $totalSold = $event->ticketTypes->sum('sold');
+                        $totalQuota = $event->ticketTypes->sum('quota');
+                        $totalRevenue = $event->ticketTypes->sum(fn($ticket) => $ticket->sold * $ticket->price);
+                    @endphp
+
+                    <tr class="event-row hover:bg-white/5 transition" 
+                        data-title="{{ strtolower($event->title) }}" 
+                        data-city="{{ strtolower($event->city) }}"
+                        data-category="{{ strtoupper($event->category) }}" 
+                        data-status="{{ strtoupper($event->status) }}">
+                        
+                        <td class="px-6 py-4 text-[#DADADA] row-number">{{ $index + 1 }}</td>
+                        <td class="px-6 py-4 font-medium text-white max-w-xs truncate">{{ $event->title }}</td>
+                        <td class="px-6 py-4 text-[#DADADA]">
+                            {{ $event->event_date ? \Carbon\Carbon::parse($event->event_date)->translatedFormat('d M Y') : '-' }}
+                            <br>
+                            <span class="text-xs text-gray-400">
+                                {{ $event->start_time ? date('H:i', strtotime($event->start_time)) : '' }} WIB
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-[#DADADA]">{{ $event->venue_name }}, {{ $event->city }}</td>
+                        <td class="px-6 py-4 text-[#DADADA]">{{ $event->category }}</td>
+                        <td class="px-6 py-4 text-[#DADADA]">{{ number_format($totalSold) }}/{{ number_format($totalQuota) }}</td>
+                        <td class="px-6 py-4 text-[#DADADA]">
+                            {{ $totalRevenue > 0 ? 'Rp ' . number_format($totalRevenue, 0, ',', '.') : '-' }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            @if($event->status == 'approved')
+                                <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-[#4A9FD4] text-[#4A9FD4] text-xs font-bold bg-[#4A9FD4]/10 uppercase">APPROVED</span>
+                            @elseif($event->status == 'pending')
+                                <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-[#C9A84C] text-[#C9A84C] text-xs font-bold bg-[#C9A84C]/10 uppercase">PENDING</span>
+                            @else
+                                <span class="inline-flex items-center justify-center px-3 py-1 rounded-full border border-red-500 text-red-500 text-xs font-bold bg-red-500/10 uppercase">{{ strtoupper($event->status) }}</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{{ route('super.events.show', $event->id) }}"
+                                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition"
+                                title="Detail Event">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor"viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                                </path>
+                                <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5
+                                12 5c4.478 0 8.268 2.943
+                                9.542 7-1.274 4.057-5.064
+                                7-9.542 7-4.477 0-8.268-2.943
+                                -9.542-7z">
+                            </path>
+                        </svg>
+                    </a>
+                                <button onclick="deleteEvent({{ $event->id }})" class="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-50 transition" title="Hapus Event">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr id="emptyRow">
+                        <td colspan="9" class="px-6 py-8 text-center text-gray-400">Tidak ada data acara yang terdaftar.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    function filterTable() {
+        const searchVal = document.getElementById('searchInput').value.toLowerCase();
+        const statusVal = document.getElementById('statusFilter').value;
+        const categoryVal = document.getElementById('categoryFilter').value;
+        const rows = document.querySelectorAll('.event-row');
+        let activeIndex = 1;
+
+        rows.forEach(row => {
+            const title = row.getAttribute('data-title');
+            const city = row.getAttribute('data-city');
+            const status = row.getAttribute('data-status').trim();
+            const category = row.getAttribute('data-category');
+
+            const matchSearch = title.includes(searchVal) || city.includes(searchVal);
+            const matchStatus = statusVal === "" || status === statusVal;
+            const matchCategory = categoryVal === "" || category === categoryVal;
+
+            if (matchSearch && matchStatus && matchCategory) {
+                row.style.display = "";
+                row.querySelector('.row-number').innerText = activeIndex++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    function updateStatus(id, action) {
+        const confirmationMessage = action === 'approve' ? 'Apakah Anda yakin ingin menyetujui (Publish) event ini?' : 'Apakah Anda yakin ingin menolak event ini?';
+        if (confirm(confirmationMessage)) {
+            fetch(`/super/event/${id}/${action}`, {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal memperbarui status.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan sistem.');
+            });
+        }
+    }
+
+    function deleteEvent(id) {
+        if (confirm('Apakah Anda yakin ingin menghapus acara ini secara permanen?')) {
+            fetch(`/super/event/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Gagal menghapus data.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan sistem.');
+            });
+        }
+    }
+</script>
 @endsection

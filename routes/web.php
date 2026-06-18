@@ -14,6 +14,9 @@ use App\Http\Controllers\EventGalleryController;
 use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\OrderController;
 
+use App\Http\Controllers\super_admin\EventController as SuperEventController;
+use App\Http\Controllers\promoter\EventController as PromoterEventController;
+use App\Http\Controllers\buyer\EventController as BuyerEventController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC
@@ -50,7 +53,7 @@ Route::post('/logout', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/email/verify', fn () => view('auth.verify-email'))
+Route::get('/email/verify', fn () => view('auth.email-verification'))
     ->middleware('auth')
     ->name('verification.notice');
 
@@ -86,44 +89,40 @@ Route::prefix('super')->middleware(['auth', 'role:super_admin'])->group(function
 });
 
 Route::get('/dashboard', fn () => view('dashboard'))
-    ->middleware(['auth', 'role:pembeli,promoter,super_admin']);
+    ->middleware(['auth', 'role:buyer,promoter,super_admin']);
 
 
-/*
-|--------------------------------------------------------------------------
-| EVENT (WEB VIEW ONLY)
-|--------------------------------------------------------------------------
-*/
-Route::get('/event', [EventController::class, 'index'])
-    ->name('event');
+Route::middleware(['auth'])->group(function () {
 
-Route::post('/event', [EventController::class, 'store'])
-    ->name('event.store');
+    // ==========================================
+    // GRUP SUPER ADMIN
+    // ==========================================
+    Route::group(['prefix' => 'super', 'as' => 'super.', 'middleware' => ['role:super-admin']], function() {
+        Route::get('/event', [SuperEventController::class, 'index'])->name('event.index');
+        Route::patch('/event/{id}/approve', [SuperEventController::class, 'approve'])->name('event.approve');
+        Route::patch('/event/{id}/reject', [SuperEventController::class, 'reject'])->name('event.reject');
+        Route::delete('/event/{id}', [SuperEventController::class, 'destroy'])->name('event.destroy');
+    });
 
-Route::post('/event/{id}/submit', [EventController::class, 'submit'])
-    ->name('event.submit');
+    // ==========================================
+    // GRUP PROMOTER
+    // ==========================================
+    Route::group(['prefix' => 'promoter', 'as' => 'promoter.', 'middleware' => ['role:promoter']], function() {
+        Route::get('/event', [PromoterEventController::class, 'index'])->name('event.index');
+        Route::post('/event', [PromoterEventController::class, 'store'])->name('event.store');
+        Route::get('/event/{id}/edit', [PromoterEventController::class, 'edit'])->name('event.edit');
+        Route::put('/event/{id}', [PromoterEventController::class, 'update'])->name('event.update');
+        Route::delete('/gallery/{id}', [PromoterEventController::class, 'deleteGallery'])->name('event.deleteGallery');
+    });
 
-Route::get('/event/{id}/edit', [EventController::class, 'edit'])
-    ->name('event.edit');
-
-Route::put('/event/{id}', [EventController::class, 'update'])
-    ->name('event.update');
-
-Route::delete('/event/{id}', [EventController::class, 'destroy'])
-    ->name('event.destroy');
-
-Route::post('/event/{event}/gallery', [EventGalleryController::class, 'store'])
-    ->middleware(['auth', 'role:promoter']);
-
-Route::delete('/event/{event}/gallery/{gallery}', [EventGalleryController::class, 'destroy'])
-    ->middleware(['auth', 'role:promoter']);
-
-Route::delete('/gallery/{id}', [EventController::class, 'deleteGallery']);
-
-Route::get('/ticket-types', [TicketTypeController::class, 'index'])
-    ->name('ticket-types.index');
-Route::post('/ticket-types', [TicketTypeController::class, 'store'])
-    ->name('ticket-types.store');
+    // ==========================================
+    // GRUP BUYER
+    // ==========================================
+    Route::group(['prefix' => 'buyer', 'as' => 'buyer.', 'middleware' => ['role:buyer']], function() {
+        Route::get('/event', [BuyerEventController::class, 'index'])->name('event.index');
+        Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
+    });
+});
 
 Route::get('/order', [OrderController::class, 'index']);
 Route::post('/order', [OrderController::class, 'store']);

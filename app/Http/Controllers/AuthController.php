@@ -59,9 +59,6 @@ class AuthController extends Controller
     };
 }
 
-
-
-
     public function register(Request $request)
     {
          $request->validate([
@@ -94,9 +91,6 @@ class AuthController extends Controller
          return redirect('/login')
          ->with('success', 'Register berhasil. Cek email untuk verifikasi.');
     }
-
-
-
 
     public function logout(Request $request)
     {
