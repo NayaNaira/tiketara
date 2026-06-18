@@ -20,11 +20,14 @@ class AuthController extends Controller
     ]);
 
     // cek email & password
-    if (!Auth::attempt($request->only('email', 'password'))) {
-        return back()->withErrors([
-            'email' => 'Email atau password salah'
-        ])->withInput();
-    }
+    if (!Auth::attempt(
+        $request->only('email', 'password'),
+        $request->filled('remember')
+        )) {
+             return back()->withErrors([
+                'email' => 'Email atau password salah'
+             ])->withInput();
+            }
 
     $request->session()->regenerate();
 

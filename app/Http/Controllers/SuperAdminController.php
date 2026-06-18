@@ -14,11 +14,13 @@ class SuperAdminController extends Controller
     }
 
     public function events()
-    {
-        $events = Event::orderBy('created_at', 'desc')->get();
-        return view('super.events.index', compact('events'));
-    }
+{
+    $events = Event::where('status', '!=', 'draft')
+        ->latest()
+        ->get();
 
+    return view('super.events.index', compact('events'));
+}
     public function eventDetail($id)
     {
         $event = Event::find($id) ?? new Event([

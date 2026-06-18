@@ -24,6 +24,9 @@ return new class extends Migration
               $table->enum('role', ['buyer', 'promoter', 'super_admin'])
                     ->default('buyer')
                      ->index();
+
+              $table->string('avatar')->nullable();
+                              
               $table->enum('status', ['verify', 'active', 'banned'])
                     ->default('verify')
                      ->index();

@@ -6,14 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventGallery;
 use App\Models\TicketType;
+use Illuminate\Http\Request; // Ditambahkan agar Request $request terbaca dengan benar
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
+    /**
+     * Menampilkan daftar semua event untuk Super Admin.
+     * Menyaring agar data berkode 'draft' mutlak tidak masuk ke layar Super Admin.
+     */
     public function index()
     {
-        // Menyaring agar data DRAFT mutlak tidak masuk ke layar Super Admin
         $events = Event::with(['galleries', 'ticketTypes'])
             ->whereIn('status', ['pending', 'approved', 'rejected'])
             ->latest()
@@ -22,54 +26,89 @@ class EventController extends Controller
         return view('super.event.index', compact('events')); 
     }
 
+    /**
+     * Menampilkan detail informasi event tertentu.
+     */
     public function show($id)
-{
-    $event = Event::with([
-        'promoter',
-        'galleries',
-        'ticketTypes'
-    ])->findOrFail($id);
+    {
+        $event = Event::with([
+            'promoter',
+            'galleries',
+            'ticketTypes'
+        ])->findOrFail($id);
 
-    return view('super.event.show', compact('event'));
-}
+        return view('super.event.show', compact('event'));
+    }
 
+    /**
+     * Menyetujui pembuatan event oleh Promoter (Publish).
+     */
     public function approve($id)
     {
-        $event = Event::where('status', 'pending')->findOrFail($id);
+        $event = Event::findOrFail($id);
         $event->update(['status' => 'approved']);
 
-        return response()->json(['success' => true, 'message' => 'Status acara berhasil disetujui (Publish).']);
+        // Mengalihkan kembali ke halaman detail dengan membawa pesan sukses ("Flash Message")
+        return redirect()->back()->with('success', 'Selamat 🎉! Event "' . $event->title . '" telah berhasil disetujui.');
     }
 
-    public function reject($id)
+    /**
+     * Menolak pembuatan event oleh Promoter disertai alasan.
+     */
+    public function reject(Request $request, $id)
     {
-        $event = Event::where('status', 'pending')->findOrFail($id);
-        $event->update(['status' => 'rejected']);
+        $request->validate([
+            'rejection_reason' => 'required|string'
+        ]);
 
-        return response()->json(['success' => true, 'message' => 'Acara ditolak dipublikasikan.']);
+        $event = Event::findOrFail($id);
+        $event->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason
+        ]);
+
+        // Mengalihkan kembali ke halaman detail dengan membawa pesan sukses penolakan
+        return redirect()->back()->with('success', 'Event telah berhasil ditolak dengan alasan yang dilampirkan.');
     }
 
+    /**
+     * Menghapus event beserta seluruh file gambar dan data turunannya.
+     */
     public function destroy($id)
     {
-        $event = Event::findOrFail($id);
+        // Load event sekaligus relasi galeri agar tidak terjadi query N+1 saat looping file
+        $event = Event::with('galleries')->findOrFail($id);
 
         try {
             DB::transaction(function () use ($event) {
-                if ($event->poster_path) {
+                // 1. Hapus file poster utama di storage jika ada
+                if ($event->poster_path && Storage::disk('public')->exists($event->poster_path)) {
                     Storage::disk('public')->delete($event->poster_path);
                 }
-                $galleries = EventGallery::where('event_id', $event->id)->get();
-                foreach ($galleries as $gallery) {
-                    Storage::disk('public')->delete($gallery->image_path);
-                    $gallery->delete();
+
+                // 2. Hapus semua file gambar yang ada di galeri event dari storage
+                foreach ($event->galleries as $gallery) {
+                    if ($gallery->image_path && Storage::disk('public')->exists($gallery->image_path)) {
+                        Storage::disk('public')->delete($gallery->image_path);
+                    }
                 }
-                TicketType::where('event_id', $event->id)->delete();
+
+                // 3. Eksekusi penghapusan data utama di database
+                // Karena migrasi Anda sudah dikonfigurasi dengan ->cascadeOnDelete(),
+                // data teks di tabel `ticket_types` dan `event_galleries` otomatis ikut terhapus oleh database.
                 $event->delete();
             });
 
-            return response()->json(['success' => true, 'message' => 'Event berhasil dihapus dari platform.']);
+            return response()->json([
+                'success' => true, 
+                'message' => 'Event dan seluruh data terkait berhasil dihapus dari platform.'
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal menghapus: ' . $e->getMessage()], 500);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Gagal menghapus event: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
