@@ -6,13 +6,14 @@
     <title>Data Pemegang Tiket - Tiketara</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
 </head>
-<body class="bg-[#020b18] min-h-screen text-white flex flex-col p-4 sm:p-6 md:p-10 relative">
+<body class="bg-[#020b18] min-h-screen text-white flex flex-col p-4 sm:p-6 md:p-10 relative font-['DM_Sans',_sans-serif]">
 
     <div class="w-full border border-[#1e3a5f] rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
         <div class="flex items-center space-x-4">
@@ -21,9 +22,15 @@
             </a>
         </div>
         
-        <div class="md:text-right w-full md:w-auto">
-            <h1 class="text-2xl font-light text-white">Data <span class="text-[#cca43b] font-normal">Pemegang</span></h1>
-            <p class="text-gray-400 text-xs mt-1 font-medium tracking-wide">
+        <div class="flex-1 text-center">
+        <h1
+            class="text-3xl text-white"
+            style="font-family: 'Playfair Display', serif;">
+            Data
+            <span class="text-[#CCA43B]">Pemegang</span>
+        </h1>
+
+            <p class="text-[#4A9FD4] text-sm mt-2 tracking-wide">
                 SZA in Jakarta · 14 Juli 2026 · Indonesia Arena
             </p>
         </div>

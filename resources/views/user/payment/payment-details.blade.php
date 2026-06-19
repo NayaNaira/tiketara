@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,13 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
 </head>
-<body class="bg-[#020b18] min-h-screen text-white flex flex-col p-4 sm:p-6 md:p-10 relative" 
+<body class="bg-[#020b18] min-h-screen text-white flex flex-col p-4 sm:p-6 md:p-10 relative font-['DM_Sans',_sans-serif]">"  
       x-data="{ showModal: false }"> <div class="w-full border border-[#1e3a5f] rounded-2xl p-4 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-10">
         <div class="flex items-center space-x-4">
             <a href="{{ url()->previous() }}" class="flex items-center space-x-2 text-white hover:text-[#cca43b] transition text-xs font-semibold tracking-wider uppercase">
@@ -26,16 +20,15 @@
             </a>
         </div>
         
-        <div class="text-left md:text-center w-full">
-            <h1
-                class="text-2xl font-light text-white"
-                style="font-family: 'Playfair Display', serif;">
-                Pembayaran
-                <span class="text-[#cca43b] font-normal">
-                    Pesanan
-                </span>
-            </h1>
-            <p class="text-gray-400 text-xs mt-1 font-medium tracking-wide">
+        <div class="flex-1 text-center">
+        <h1
+            class="text-3xl text-white"
+            style="font-family: 'Playfair Display', serif;">
+            Pembayaran
+            <span class="text-[#CCA43B]">Pesanan</span>
+        </h1>
+
+            <p class="text-[#4A9FD4] text-sm mt-2 tracking-wide">
                 SZA in Jakarta · 14 Juli 2026 · Indonesia Arena
             </p>
         </div>
