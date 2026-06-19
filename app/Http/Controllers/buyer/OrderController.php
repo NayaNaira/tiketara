@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\buyer;
 
+use App\Http\Controllers\Controller; 
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\TicketType;

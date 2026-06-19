@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\promoter;
 
+use App\Http\Controllers\Controller;
 use App\Models\EventGallery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

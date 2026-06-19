@@ -29,8 +29,14 @@
 
         <div class="flex items-center gap-2 md:gap-4">
             @auth
-                <a href="{{ url('/dashboard') }}" class="w-7 h-7 md:w-9 md:h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-[#C9A84C] transition">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=C9A84C&color=fff" alt="Profile" class="w-full h-full object-cover">
+                <a href="{{ url('/dashboard') }}" class="w-7 h-7 md:w-9 md:h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-[#C9A84C] transition block">
+                    @if(auth()->user()->avatar)
+                        <!-- Jika ada avatar Google, tampilkan di sini -->
+                        <img src="{{ auth()->user()->avatar }}" alt="Profile" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                    @else
+                        <!-- fallback jika daftar manual tanpa Google -->
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=C9A84C&color=fff" alt="Profile" class="w-full h-full object-cover">
+                    @endif
                 </a>
             @else
                 <a href="{{ route('login') }}" class="text-xs md:text-sm font-medium hover:text-[#C9A84C] transition text-white">Log in</a>

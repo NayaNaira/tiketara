@@ -4,15 +4,16 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ForgotPasswordController;
-use App\Http\Controllers\EventGalleryController;
-use App\Http\Controllers\TicketTypeController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\buyer\OrderController; 
 
+// Import Controller Khusus Super Admin dari subfolder super_admin
+use App\Http\Controllers\super_admin\DashboardController;
+use App\Http\Controllers\super_admin\TransactionController;
 use App\Http\Controllers\super_admin\EventController as SuperEventController;
+
 use App\Http\Controllers\promoter\EventController as PromoterEventController;
 use App\Http\Controllers\buyer\EventController as BuyerEventController;
 
@@ -29,6 +30,13 @@ Route::get('/', fn () => view('welcome'));
 | AUTHENTICATION ROUTES
 |--------------------------------------------------------------------------
 */
+// Mengarahkan ke Google dengan aman (Rute Ganda yang bentrok sudah dihapus)
+Route::get('/auth/google/redirect', function () {
+    return Socialite::driver('google')->stateless()->redirect();
+})->name('auth.google.redirect');
+
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
 Route::get('/login', fn () => view('auth.login'))->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -86,20 +94,21 @@ Route::middleware(['auth'])->group(function () {
     // SUPER ADMIN GROUP (Fixed Role: super_admin)
     // ==========================================
     Route::group(['prefix' => 'super', 'as' => 'super.', 'middleware' => ['role:super_admin']], function() {
-        // Analytics & Reports (Menggunakan SuperAdminController)
-        Route::get('/', [SuperAdminController::class, 'events'])->name('events.index');
-        Route::get('/summary', [SuperAdminController::class, 'summary'])->name('summary');
-        Route::get('/reports', [SuperAdminController::class, 'reports'])->name('reports.index');
-        Route::get('/export', [SuperAdminController::class, 'export'])->name('export');
+        
+        // Analytics & Reports
+        Route::get('/', [DashboardController::class, 'summary'])->name('dashboard');
+        Route::get('/summary', [DashboardController::class, 'summary'])->name('summary');
+        Route::get('/reports', [DashboardController::class, 'reports'])->name('reports.index');
+        Route::get('/export', [DashboardController::class, 'export'])->name('export');
 
         // Transactions Management
-        Route::get('/transactions', [SuperAdminController::class, 'transactions'])->name('transactions.index');
-        Route::get('/transactions/event/{id}', [SuperAdminController::class, 'transactionEventList'])->name('transactions.list');
-        Route::get('/transactions/{id}', [SuperAdminController::class, 'transactionDetail'])->name('transactions.show');
+        Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('/transactions/event/{id}', [TransactionController::class, 'eventList'])->name('transactions.list');
+        Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 
-        // Event Management & Approval Action (Menggunakan SuperEventController)
-        Route::get('/event', [SuperEventController::class, 'index'])->name('event.manage'); // Diubah namanya agar tidak bentrok dengan index utama admin
-        Route::get('/events/{id}', [SuperAdminController::class, 'eventDetail'])->name('events.show');
+        // Event Management & Approval Action
+        Route::get('/event', [SuperEventController::class, 'index'])->name('event.manage');
+        Route::get('/events/{id}', [SuperEventController::class, 'show'])->name('events.show'); 
         Route::patch('/event/{id}/approve', [SuperEventController::class, 'approve'])->name('event.approve');
         Route::patch('/event/{id}/reject', [SuperEventController::class, 'reject'])->name('event.reject');
         Route::delete('/event/{id}', [SuperEventController::class, 'destroy'])->name('event.destroy');

@@ -9,10 +9,10 @@
 <body class="bg-[#020D1A] min-h-screen flex flex-col justify-between text-white p-6 relative select-none">
 
     <header class="px-4 sm:px-8 py-4">
-    <img
-        src="{{ asset('images/logotiket.png') }}"
-        alt="Tiketara"
-        class="h-14 w-auto">
+        <img
+            src="{{ asset('images/logotiket.png') }}"
+            alt="Tiketara"
+            class="h-14 w-auto">
     </header>
 
     <main class="flex-grow flex items-center justify-center w-full max-w-4xl mx-auto z-10 my-12">
@@ -22,9 +22,23 @@
                 Selamat Datang!
             </h2>
 
-            <p class="text-[#4A9FD4] text-sm font-light mb-8 leading-relaxed">
+            <p class="text-[#4A9FD4] text-sm font-light mb-6 leading-relaxed">
                 Kelola konser dan transaksi dalam satu platform.
             </p>
+
+            <!-- ALERT NOTIFIKASI SUKSES / ERROR GLOBAL -->
+            @if(session('success'))
+                <div class="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-sm rounded-xl">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->has('email') && !$errors->has('password'))
+                <!-- Menampilkan pesan error dari login biasa atau kegagalan google -->
+                <div class="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-300 text-sm rounded-xl">
+                    {{ $errors->first('email') }}
+                </div>
+            @endif
 
             <form action="{{ route('login') }}" method="POST" class="space-y-5">
                 @csrf
@@ -37,16 +51,12 @@
                         <input
                             type="email"
                             name="email"
+                            value="{{ old('email') }}"
                             placeholder="@email.com"
                             class="w-full bg-[#E2E8F0] text-[#020D1A] font-medium py-3 px-4 rounded-xl placeholder-gray-400 text-sm md:text-base outline-none focus:outline-none"
                             required>
                     </div>
                 </div>
-                @error('email')
-                     <div class="mt-2 text-sm text-red-400">
-                      {{ $message }}
-                     </div>
-                @enderror
 
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-300 tracking-wide">
@@ -90,77 +100,52 @@
                 </div>
 
                 <div class="space-y-4">
+                    <button
+                        type="submit"
+                        class="w-full bg-[#C9A84C] hover:opacity-90 transition text-black font-semibold py-3 rounded-md">
+                        Masuk →
+                    </button>
 
-                        <button
-                            type="submit"
-                            class="w-full bg-[#C9A84C] hover:opacity-90 transition text-black font-semibold py-3 rounded-md">
-
-                            Masuk →
-                        </button>
-
-                        <a 
-                        href="#"
+                    <!-- SEKARANG LINK GOOGLE SUDAH DIARAHKAN KE ROUTE REDIRECT -->
+                    <a 
+                        href="{{ route('auth.google.redirect') }}"
                         class="w-full border border-[#C9A84C] hover:bg-white/5 text-white font-medium py-3 rounded-md flex items-center justify-center gap-3 transition">
-
+                        
                         <img
                             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                             alt="Google"
                             class="w-5 h-5">
 
                         <span>Masuk dengan Google</span>
-
                     </a>
-
-                    </div>
-                
-
-            </form>
-            <div class="border-t border-[#4A9FD4]/40 mt-8 pt-5">
-
-                    <p class="text-center text-sm">
-
-                        <span class="text-[#4A9FD4]">
-                            Belum punya akun?
-                        </span>
-
-                        <a
-                            href="/register"
-                            class="text-[#C9A84C] hover:underline font-medium">
-
-                            Registrasi
-
-                        </a>
-
-                    </p>
-
                 </div>
+            </form>
+
+            <div class="border-t border-[#4A9FD4]/40 mt-8 pt-5">
+                <p class="text-center text-sm">
+                    <span class="text-[#4A9FD4]">
+                        Belum punya akun?
+                    </span>
+                    <a
+                        href="/register"
+                        class="text-[#C9A84C] hover:underline font-medium">
+                        Registrasi
+                    </a>
+                </p>
+            </div>
         </div>
     </main>
 
     <footer class="text-center mt-8">
-
-                <p class="text-gray-300 text-xs">
-                    ©2026 TicketFlow Management Systems.
-                    All rights reserved.
-                </p>
-
-                <div class="flex justify-center gap-6 mt-4 text-xs">
-
-                    <a href="#" class="text-gray-300 hover:text-[#C9A84C]">
-                        Privacy Policy
-                    </a>
-
-                    <a href="#" class="text-gray-300 hover:text-[#C9A84C]">
-                        Terms of Service
-                    </a>
-
-                    <a href="#" class="text-gray-300 hover:text-[#C9A84C]">
-                        Support
-                    </a>
-
-                </div>
-
-            </footer>
+        <p class="text-gray-300 text-xs">
+            ©2026 TicketFlow Management Systems. All rights reserved.
+        </p>
+        <div class="flex justify-center gap-6 mt-4 text-xs">
+            <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Privacy Policy</a>
+            <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Terms of Service</a>
+            <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Support</a>
+        </div>
+    </footer>
 
     <script>
         function togglePassword(inputId, visibleIconId, hiddenIconId) {

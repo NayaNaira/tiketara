@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\promoter;
 
+use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\TicketType;
 use Illuminate\Http\Request;
