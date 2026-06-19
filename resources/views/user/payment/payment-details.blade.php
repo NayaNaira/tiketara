@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Transfer Pembayaran - Tiketara</title>
+
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -22,7 +27,14 @@
         </div>
         
         <div class="text-left md:text-center w-full">
-            <h1 class="text-2xl font-light text-white">Pembayaran <span class="text-[#cca43b] font-normal">Pesanan</span></h1>
+            <h1
+                class="text-2xl font-light text-white"
+                style="font-family: 'Playfair Display', serif;">
+                Pembayaran
+                <span class="text-[#cca43b] font-normal">
+                    Pesanan
+                </span>
+            </h1>
             <p class="text-gray-400 text-xs mt-1 font-medium tracking-wide">
                 SZA in Jakarta · 14 Juli 2026 · Indonesia Arena
             </p>

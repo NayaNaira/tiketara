@@ -89,15 +89,51 @@
                     </a>
                 </div>
 
-                <div class="pt-4">
-                    <button
-                        type="submit"
-                        class="w-full bg-[#C9A84C] hover:bg-[#b59540] active:scale-[0.98] text-[#020D1A] font-bold py-3.5 rounded-xl transition-all duration-200 text-sm tracking-wider shadow-lg">
-                        Masuk &rarr;
-                    </button>
-                </div>
+                <div class="space-y-4">
+
+                        <button
+                            type="submit"
+                            class="w-full bg-[#C9A84C] hover:opacity-90 transition text-black font-semibold py-3 rounded-md">
+
+                            Masuk →
+                        </button>
+
+                        <a 
+                        href="#"
+                        class="w-full border border-[#C9A84C] hover:bg-white/5 text-white font-medium py-3 rounded-md flex items-center justify-center gap-3 transition">
+
+                        <img
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google"
+                            class="w-5 h-5">
+
+                        <span>Masuk dengan Google</span>
+
+                    </a>
+
+                    </div>
+                
 
             </form>
+            <div class="border-t border-[#4A9FD4]/40 mt-8 pt-5">
+
+                    <p class="text-center text-sm">
+
+                        <span class="text-[#4A9FD4]">
+                            Belum punya akun?
+                        </span>
+
+                        <a
+                            href="/register"
+                            class="text-[#C9A84C] hover:underline font-medium">
+
+                            Registrasi
+
+                        </a>
+
+                    </p>
+
+                </div>
         </div>
     </main>
 
