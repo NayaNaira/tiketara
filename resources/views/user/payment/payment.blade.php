@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pembayaran</title>
+    <title>Pembayaran - Tiketara</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 </head>
 <body class="bg-[#020b18] min-h-screen text-white flex flex-col p-4 sm:p-6 md:p-10 relative font-['DM_Sans',_sans-serif]">
 
@@ -22,12 +23,11 @@
         </div>
         
         <div class="flex-1 text-center">
-        <h1
-            class="text-3xl text-white"
-            style="font-family: 'Playfair Display', serif;">
-            Pembayaran
-            <span class="text-[#CCA43B]">Tiket</span>
-        </h1>
+            <h1 class="text-3xl text-white" style="font-family: 'Playfair Display', serif;">
+                Pembayaran <span class="text-[#CCA43B]">Tiket</span>
+            </h1>
+        </div>
+        <div class="w-4 hidden md:block"></div>
     </div>
 
     <main class="w-full max-w-xl mx-auto flex flex-col items-center my-auto space-y-8">
@@ -57,33 +57,59 @@
                 <div class="w-24 h-[1px] bg-gray-800 mx-auto mt-3"></div>
             </div>
 
-            <div class="border-2 border-[#cca43b] rounded-xl px-25 py-6 bg-transparent flex items-center justify-center select-none shadow-md">
-                <span class="text-lg font-black tracking-wider text-white italic">QRIS</span>
+            <div class="border-2 border-[#cca43b] rounded-xl px-24 py-5 bg-transparent flex items-center justify-center select-none shadow-md">
+                <span class="text-lg font-black tracking-wider text-white italic">MIDTRANS SNAP</span>
             </div>
 
-            <p class="text-xxs tracking-wider text-[#41628d] font-bold uppercase">Scan QR di bawah</p>
+            <p class="text-xxs tracking-wider text-[#41628d] font-bold uppercase">Klik tombol di bawah untuk membayar</p>
 
-            <div class="bg-white p-4 rounded-2xl shadow-2xl transition hover:scale-[1.01] duration-300">
-                {!! QrCode::size(200)->backgroundColor(255,255,255)->color(0,0,0)->generate('SZA-JKT-2-VIP-3030000') !!}
+            <div class="bg-white/5 p-8 rounded-2xl border border-[#1e3a5f]/40 text-center w-48 h-48 flex flex-col items-center justify-center space-y-3">
+                <i class="fa-solid fa-qrcode text-5xl text-[#cca43b] animate-pulse"></i>
+                <span class="text-[10px] text-gray-400">Pop-up QRIS / Bank Transfer</span>
             </div>
 
             <div class="text-center space-y-1">
-                <p class="text-xxs font-semibold tracking-widest text-[#41628d] uppercase">SZA-JKT-2-VIP</p>
-                <p class="text-xl font-bold text-[#cca43b] tracking-wide">Rp 3.030.000</p>
+                <p class="text-xxs font-semibold tracking-widest text-[#41628d] uppercase">
+                    {{ $order->event->title }} - {{ $order->ticketType->name }} ({{ $order->quantity }}x)
+                </p>
+                <p class="text-xl font-bold text-[#cca43b] tracking-wide">
+                    Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                </p>
             </div>
 
             <div class="w-full pt-4">
-                <form action="#" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3.5 rounded-lg flex items-center justify-center space-x-2 transition shadow-lg group uppercase tracking-wider active:scale-[0.99]">
-                        <span>Konfirmasi Pembayaran</span>
-                        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                    </button>
-                </form>
+                <button type="button" id="pay-button" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3.5 rounded-lg flex items-center justify-center space-x-2 transition shadow-lg group uppercase tracking-wider active:scale-[0.99] cursor-pointer">
+                    <span>Buka Pop-up Pembayaran</span>
+                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </button>
             </div>
         </div>
 
     </main>
+
+    <script type="text/javascript">
+        const payButton = document.getElementById('pay-button');
+        payButton.addEventListener('click', function () {
+            // Membuka pop-up transaksi Midtrans aman menggunakan Snap Token dari Controller
+            window.snap.pay('{{ $snapToken }}', {
+                onSuccess: function(result){
+                    alert("Pembayaran berhasil dicatat! Mengalihkan ke E-Tiket...");
+                    // Lempar otomatis ke halaman cetak E-Tiket ber-barcode
+                    window.location.href = "{{ route('buyer.order.ticket', $order->id) }}";
+                },
+                onPending: function(result){
+                    alert("Menunggu penyelesaian pembayaran Anda.");
+                    window.location.reload();
+                },
+                onError: function(result){
+                    alert("Transaksi gagal. Silakan coba lagi.");
+                },
+                onClose: function(){
+                    alert('Anda menutup pop-up sebelum menyelesaikan pembayaran.');
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>

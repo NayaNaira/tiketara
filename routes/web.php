@@ -38,9 +38,8 @@ Route::get('/', function () {
 // Detail Event
 Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
 
-
-// Midtrans Payment
-Route::post('/buyer/payment/notification', [App\Http\Controllers\buyer\EventController::class, 'paymentNotification']);
+// Midtrans Payment Webhook (Notifikasi Otomatis dari Server Midtrans)
+Route::post('/buyer/payment/notification', [OrderController::class, 'paymentNotification']);
 
 
 /*
@@ -110,8 +109,6 @@ Route::middleware('auth')->group(function () {
 | PROTECTED DASHBOARD ROUTES (SHARED ACCESSIBILITY)
 |--------------------------------------------------------------------------
 */
-// Promoter dashboard routes are defined under the promoter group prefix below
-
 Route::get('/dashboard', fn () => view('dashboard'))
     ->middleware(['auth', 'role:buyer,promoter,super_admin']);
 
@@ -175,26 +172,35 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ====================================================================
-    // BUYER GROUP
+    // BUYER GROUP - ✅ FIXED (DUPLIKASI DIHAPUS)
     // ====================================================================
     Route::group(['prefix' => 'buyer', 'as' => 'buyer.', 'middleware' => ['role:buyer']], function() {
+        
+        // Event Listing
         Route::get('/event', [BuyerEventController::class, 'index'])->name('event.index');
 
         // STEP 1: Pilih Kategori & Jumlah Tiket
         Route::get('/event/{id}/select-ticket', [BuyerEventController::class, 'selectTicket'])->name('ticket.select');
         Route::post('/event/{id}/select-ticket', [BuyerEventController::class, 'saveTicketSelection'])->name('ticket.select.store');
-        
+
         // STEP 2: Isi Data Diri Pemegang Tiket
         Route::get('/event/{id}/checkout', [BuyerEventController::class, 'checkoutForm'])->name('checkout.form');
-        Route::post('/event/{id}/checkout', [BuyerEventController::class, 'checkoutStore'])->name('checkout.store');
+        Route::post('/event/{id}/checkout', [OrderController::class, 'checkoutStore'])->name('checkout.store');
 
-        // STEP 3: Ringkasan & Metode Pembayaran
-        Route::get('/event/booking/payment', [BuyerEventController::class, 'paymentPage'])->name('payment.page');
+        // STEP 3: Ringkasan Transaksi (Summary)
+        Route::get('/order/review/{eventId}', [OrderController::class, 'reviewOrder'])->name('order.review');
+
+        // STEP 4: Proses Generate Token Midtrans & Save DB tabel Orders
+        Route::post('/order/store/{eventId}', [OrderController::class, 'store'])->name('order.store');
+
+        // STEP 5: Tampilan Halaman Bayar Pop-Up QRIS
+        Route::get('/order/payment/{id}', [OrderController::class, 'paymentPage'])->name('order.payment');
+
+        // STEP 6: Tampilan Cetak E-Tiket
+        Route::get('/order/{id}/ticket', [OrderController::class, 'viewTicket'])->name('order.ticket');
+
+        // BONUS: Cek Status Transaksi Manual (Debugging)
+        Route::get('/order/{id}/check-status', [OrderController::class, 'checkStatus'])->name('order.checkStatus');
     });
 
-    // ====================================================================
-    // ORDER PROCESS (Shared Authenticated Users)
-    // ====================================================================
-    Route::get('/order', [OrderController::class, 'index']);
-    Route::post('/order', [OrderController::class, 'store']);
 });

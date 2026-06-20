@@ -46,5 +46,25 @@ public function run(): void
         'promoter_status' => 'none',
         'password' => Hash::make('buyer'),
     ]);
+
+    User::create([
+        'name' => 'Promoter2',
+        'email' => 'promoter2@gmail.com',
+        'email_verified_at' => now(),
+        'status' => 'active',
+        'role' => 'promoter',
+        'promoter_status' => 'approved',
+        'password' => Hash::make('promoter2'),
+    ]);
+
+    User::create([
+        'name' => 'Promoter3',
+        'email' => 'promoter3@gmail.com',
+        'email_verified_at' => now(),
+        'status' => 'active',
+        'role' => 'promoter',
+        'promoter_status' => 'approved',
+        'password' => Hash::make('promoter3'),
+    ]);
 }
 }

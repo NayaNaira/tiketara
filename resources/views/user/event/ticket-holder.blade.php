@@ -26,7 +26,7 @@
             </h1>
 
             <p class="text-[#4A9FD4] text-sm mt-2 tracking-wide">
-                {{ $event->title }} · {{ \Carbon\Carbon::parse($event->event_date)->translatedFormat('d F Y') }} · {{ $event->venue_name ?? $event->venue }}
+                {{ $event->title }} · {{ \Carbon\Carbon::parse($event->event_date ?? $event->date)->translatedFormat('d F Y') }} · {{ $event->venue_name ?? $event->location }}
             </p>
         </div>
     </div>
@@ -52,8 +52,9 @@
             </div>
         </div>
 
+        <!-- FIX: Mengubah rute ke checkout.store dan metode pengiriman ke POST -->
         <form action="{{ route('buyer.checkout.store', $event->id) }}" method="POST" class="w-full space-y-6 flex flex-col items-center">
-            @csrf
+            @csrf <!-- Token keamanan Laravel wajib ada untuk form POST -->
             
             <div class="w-full p-6 border border-[#1e3a5f] rounded-2xl bg-[#020b18]/50 space-y-5">
                 <h2 class="text-center text-xxs font-bold tracking-widest text-[#cca43b] uppercase mb-2">Informasi Pemegang Tiket</h2>
@@ -94,9 +95,9 @@
                 </div>
             </div>
 
-            <div class="w-full max-w-xs pt-4">
-                <button type="submit" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3.5 rounded-lg flex items-center justify-center space-x-2 transition shadow-lg group uppercase tracking-wider active:scale-[0.99]">
-                    <span>Lanjut ke Pembayaran</span>
+            <div class="w-full max-w-xs pt-4 mx-auto">
+                <button type="submit" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3.5 rounded-lg flex items-center justify-center space-x-2 transition shadow-lg group uppercase tracking-wider active:scale-[0.99] cursor-pointer">
+                    <span>Lanjut ke Ringkasan</span>
                     <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                 </button>
             </div>
