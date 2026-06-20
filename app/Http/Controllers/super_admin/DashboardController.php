@@ -73,6 +73,11 @@ class DashboardController extends Controller
      */
     public function export(Request $request)
     {
+        $event = null;
+        if ($request->has('event_id') && $request->get('event_id') != '') {
+            $event = Event::with(['ticketTypes', 'orders.user'])->find($request->get('event_id'));
+        }
+
         // JIKA TIDAK ADA PILIHAN FORMAT: Tampilkan halaman form konfigurasinya
         if (!$request->has('format')) {
             $currentYear = date('Y'); // Mengambil tahun berjalan (2026)
@@ -104,7 +109,7 @@ class DashboardController extends Controller
                 return ($value / $maxSales) * 100;
             }, $monthlyData);
 
-            return view('super.reports.export', compact('stats', 'monthlyData'));
+            return view('super.reports.export', compact('stats', 'monthlyData', 'event'));
         }
 
         // JIKA TOMBOL DOWNLOAD DIKLIK (Proses Ekspor Berjalan)
@@ -112,10 +117,15 @@ class DashboardController extends Controller
         $year = $request->get('period_year', 2026);
 
         // Ambil data manifestasi transaksi lunas sesuai filter tahun
-        $orders = Order::with(['user', 'event'])
+        $query = Order::with(['user', 'event'])
             ->where('status', 'paid')
-            ->whereYear('created_at', $year)
-            ->get();
+            ->whereYear('created_at', $year);
+
+        if ($event) {
+            $query->where('events_id', $event->id);
+        }
+
+        $orders = $query->get();
 
         // 🟢 PROSES EKSPOR EXCEL (.XLS / .XLSX)
         if ($format === 'xlsx') {
@@ -184,6 +194,6 @@ class DashboardController extends Controller
         }
 
         // 🔴 PROSES EKSPOR PDF (Trik Cetak Instan Windows Print)
-        return view('super.reports.pdf_template', compact('orders', 'year'));
+        return view('super.reports.pdf_template', compact('orders', 'year', 'event'));
     }
 }

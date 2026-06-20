@@ -3,17 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - @yield('title', 'Dashboard')</title>
-        <link rel="preconnect" href="https://fonts.bunny.net">
+    <title>Penyelenggara - @yield('title', 'Dashboard')</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=playfair-display:400,600,700|dm-sans:400,500,700" rel="stylesheet" />
-    @vite(['resources/css/app.css'])
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #020D1A; }
+        ::-webkit-scrollbar-thumb { background: #202020; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
+        input[type="datetime-local"], input[type="time"], input[type="date"] { color-scheme: dark; }
+    </style>
 </head>
 <body class="antialiased min-h-screen bg-[#020D1A] text-white font-['DM_Sans',_sans-serif] flex">
 
     <!-- Sidebar Backdrop for Mobile -->
     <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-40 lg:hidden hidden transition-opacity duration-300" onclick="toggleSidebar()"></div>
 
-    <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#031124] border-r border-[#202020] flex flex-col h-screen transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static lg:transform-none shrink-0">
+    <aside id="promoter-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#031124] border-r border-[#202020] flex flex-col h-screen transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:static lg:transform-none shrink-0">
         <div class="p-6 flex flex-col items-center border-b border-black mb-4 relative">
             <!-- Close button for mobile -->
             <button onclick="toggleSidebar()" class="absolute right-4 top-4 text-gray-400 hover:text-white lg:hidden" aria-label="Tutup Sidebar">
@@ -22,7 +30,7 @@
                 </svg>
             </button>
             <img src="{{ asset('images/logotiket.png') }}" alt="Logo" class="h-12 mb-2 object-contain">
-            <span class="text-white text-sm font-medium tracking-wide">Super Admin</span>
+            <span class="text-white text-sm font-medium tracking-wide">Penyelenggara</span>
         </div>
 
         <nav class="flex-1 px-4 py-2 space-y-3 overflow-y-auto">
@@ -30,17 +38,16 @@
                 $currentRoute = request()->route()->getName();
                 
                 $navItems = [
-                    ['route' => 'super.events.index', 'label' => 'Daftar Acara', 'active' => str_starts_with($currentRoute, 'super.events')],
-                    ['route' => 'super.transactions.index', 'label' => 'Daftar Transaksi', 'active' => str_starts_with($currentRoute, 'super.transactions')],
-                    ['route' => 'super.summary', 'label' => 'Ringkasan', 'active' => $currentRoute == 'super.summary'],
-                    ['route' => 'super.reports.index', 'label' => 'Laporan', 'active' => str_starts_with($currentRoute, 'super.reports') && $currentRoute != 'super.export'],
-                    ['route' => 'super.export', 'label' => 'Export Laporan', 'active' => $currentRoute == 'super.export'],
+                    ['route' => 'promoter.event.index', 'label' => 'Edit Acara', 'active' => $currentRoute == 'promoter.event.index' || str_contains($currentRoute, 'promoter.event.edit')],
+                    ['route' => 'promoter.event.create', 'label' => 'Daftarkan Acara', 'active' => $currentRoute == 'promoter.event.create'],
+                    ['route' => 'promoter.dashboard', 'label' => 'Ringkasan', 'active' => $currentRoute == 'promoter.dashboard'],
+                    ['route' => 'promoter.reports', 'label' => 'Export Laporan', 'active' => $currentRoute == 'promoter.reports'],
                 ];
             @endphp
 
             @foreach ($navItems as $item)
                 @php
-                    $url = isset($item['params']) ? route($item['route'], $item['params']) : route($item['route']);
+                    $url = route($item['route']);
                     $isActive = $item['active'];
                 @endphp
                 <a href="{{ $url }}" 
@@ -73,10 +80,10 @@
 
             <!-- Profile Card -->
             <button onclick="toggleUserDropdown(event)" class="w-full bg-[#4A9FD4] rounded-2xl p-2.5 flex items-center gap-3 hover:opacity-95 transition text-left cursor-pointer border-0 focus:outline-none">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'San') }}&background=222&color=fff" alt="User" class="w-10 h-10 rounded-full border-2 border-white/20">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'Penyelenggara') }}&background=222&color=fff" alt="User" class="w-10 h-10 rounded-full border-2 border-white/20">
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-white leading-tight truncate">{{ auth()->user()->name ?? 'San' }}</p>
-                    <p class="text-[10px] text-white/90 font-medium truncate">Super Admin</p>
+                    <p class="text-xs font-bold text-white leading-tight truncate">{{ auth()->user()->name ?? 'Penyelenggara' }}</p>
+                    <p class="text-[10px] text-white/90 font-medium truncate">Penyelenggara</p>
                 </div>
                 <!-- Dropdown Arrow -->
                 <svg class="w-3.5 h-3.5 text-white/80 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +103,7 @@
             </button>
             <div class="flex items-center gap-2">
                 <img src="{{ asset('images/logotiket.png') }}" alt="Logo" class="h-8 object-contain">
-                <span class="text-xs font-semibold tracking-wide">Admin</span>
+                <span class="text-xs font-semibold tracking-wide">Penyelenggara</span>
             </div>
             <div class="w-8"></div>
         </header>
@@ -108,7 +115,7 @@
 
     <script>
         function toggleSidebar() {
-            const sidebar = document.getElementById('admin-sidebar');
+            const sidebar = document.getElementById('promoter-sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
             
             if (sidebar.classList.contains('-translate-x-full')) {
@@ -124,7 +131,7 @@
         
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024) {
-                const sidebar = document.getElementById('admin-sidebar');
+                const sidebar = document.getElementById('promoter-sidebar');
                 const backdrop = document.getElementById('sidebar-backdrop');
                 if (sidebar.classList.contains('translate-x-0')) {
                     sidebar.classList.remove('translate-x-0');
@@ -144,7 +151,6 @@
             }
         }
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('user-dropdown');
             if (dropdown && !dropdown.classList.contains('hidden')) {

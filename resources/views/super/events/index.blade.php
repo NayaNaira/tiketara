@@ -2,12 +2,12 @@
 @section('title', 'Daftar Acara')
 
 @section('content')
-<header class="p-8 pb-4">
+<header class="p-4 lg:p-8 pb-2 lg:pb-4">
     <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Daftar Acara</h1>
     <p class="text-sm text-[#4A9FD4]">Kelola semua acara yang terdaftar di platform</p>
 </header>
 
-<div class="flex-1 p-8 pt-0 overflow-y-auto">
+<div class="flex-1 p-4 lg:p-8 lg:pt-0 pt-0 overflow-y-auto">
     <div class="flex flex-wrap gap-4 mb-6 items-center">
         <div class="relative flex-1 min-w-[200px]">
             <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
