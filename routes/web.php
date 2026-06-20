@@ -5,32 +5,42 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
+use App\Models\Event; 
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\buyer\OrderController; 
+use App\Http\Controllers\ProfileController;
 
-// Import Controller Khusus Super Admin dari subfolder super_admin
+// Import Controller Buyer
+use App\Http\Controllers\buyer\OrderController; 
+use App\Http\Controllers\buyer\EventController as BuyerEventController;
+
+// Import Controller Khusus Super Admin
 use App\Http\Controllers\super_admin\DashboardController;
 use App\Http\Controllers\super_admin\TransactionController;
 use App\Http\Controllers\super_admin\EventController as SuperEventController;
+use App\Http\Controllers\super_admin\AdminController; 
+use App\Http\Controllers\super_admin\ReportController;
 
+
+// Import Controller Promoter
 use App\Http\Controllers\promoter\EventController as PromoterEventController;
-use App\Http\Controllers\buyer\EventController as BuyerEventController;
 
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn () => view('welcome'));
 
+Route::get('/', function () {
+    $events = Event::with('ticketTypes'); 
 
+    return view('welcome', compact('events'));
+});
 /*
 |--------------------------------------------------------------------------
 | AUTHENTICATION ROUTES
 |--------------------------------------------------------------------------
 */
-// Mengarahkan ke Google dengan aman (Rute Ganda yang bentrok sudah dihapus)
 Route::get('/auth/google/redirect', function () {
     return Socialite::driver('google')->stateless()->redirect();
 })->name('auth.google.redirect');
@@ -73,6 +83,23 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 /*
 |--------------------------------------------------------------------------
+| PROFILE & PROMOTER APPLY
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Promoter Apply
+    Route::get('/promoter/apply', [ProfileController::class, 'applyPromoter'])->name('promoter.apply');
+    Route::post('/promoter/apply/store', [ProfileController::class, 'storePromoterApplication'])->name('promoter.apply.store');
+});
+
+
+/*
+|--------------------------------------------------------------------------
 | PROTECTED DASHBOARD ROUTES (SHARED ACCESSIBILITY)
 |--------------------------------------------------------------------------
 */
@@ -90,9 +117,9 @@ Route::get('/dashboard', fn () => view('dashboard'))
 */
 Route::middleware(['auth'])->group(function () {
 
-    // ==========================================
+    // ====================================================================
     // SUPER ADMIN GROUP (Fixed Role: super_admin)
-    // ==========================================
+    // ====================================================================
     Route::group(['prefix' => 'super', 'as' => 'super.', 'middleware' => ['role:super_admin']], function() {
         
         // Analytics & Reports
@@ -100,23 +127,33 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/summary', [DashboardController::class, 'summary'])->name('summary');
         Route::get('/reports', [DashboardController::class, 'reports'])->name('reports.index');
         Route::get('/export', [DashboardController::class, 'export'])->name('export');
-
-        // Transactions Management
+        Route::get('/reports/{id}', [DashboardController::class, 'showReport'])->name('reports.detail');
+        
+        // Transactions Management (Sudah disinkronkan namanya ke .eventList)
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-        Route::get('/transactions/event/{id}', [TransactionController::class, 'eventList'])->name('transactions.list');
+        Route::get('/transactions/event/{id}', [TransactionController::class, 'eventList'])->name('transactions.eventList');
         Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 
         // Event Management & Approval Action
-        Route::get('/event', [SuperEventController::class, 'index'])->name('event.manage');
+        Route::get('/event', [SuperEventController::class, 'index'])->name('events.index');
         Route::get('/events/{id}', [SuperEventController::class, 'show'])->name('events.show'); 
         Route::patch('/event/{id}/approve', [SuperEventController::class, 'approve'])->name('event.approve');
         Route::patch('/event/{id}/reject', [SuperEventController::class, 'reject'])->name('event.reject');
         Route::delete('/event/{id}', [SuperEventController::class, 'destroy'])->name('event.destroy');
+
+        // Approval Promoter
+        Route::get('/promoter-requests', [AdminController::class, 'promoterRequests'])->name('promoter.requests');
+        Route::post('/promoter-requests/{id}/action', [AdminController::class, 'handlePromoterRequest'])->name('promoter.action');
+        
+        // Export Laporan
+        Route::get('/super/report', [ReportController::class, 'index'])->name('super.report');
+        Route::get('/super/report/export', [ReportController::class, 'export'])->name('super.export');
+        
     });
 
-    // ==========================================
+    // ====================================================================
     // PROMOTER GROUP
-    // ==========================================
+    // ====================================================================
     Route::group(['prefix' => 'promoter', 'as' => 'promoter.', 'middleware' => ['role:promoter']], function() {
         Route::get('/event', [PromoterEventController::class, 'index'])->name('event.index');
         Route::post('/event', [PromoterEventController::class, 'store'])->name('event.store');
@@ -125,17 +162,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/gallery/{id}', [PromoterEventController::class, 'deleteGallery'])->name('event.deleteGallery');
     });
 
-    // ==========================================
+    // ====================================================================
     // BUYER GROUP
-    // ==========================================
+    // ====================================================================
     Route::group(['prefix' => 'buyer', 'as' => 'buyer.', 'middleware' => ['role:buyer']], function() {
         Route::get('/event', [BuyerEventController::class, 'index'])->name('event.index');
         Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
     });
 
-    // ==========================================
+    // ====================================================================
     // ORDER PROCESS (Shared Authenticated Users)
-    // ==========================================
+    // ====================================================================
     Route::get('/order', [OrderController::class, 'index']);
     Route::post('/order', [OrderController::class, 'store']);
 });

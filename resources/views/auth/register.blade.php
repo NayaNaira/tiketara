@@ -128,6 +128,14 @@
             <span class="text-xs text-gray-400 tracking-wide">Atau buat akun dengan</span>
         </div>
 
+        <a 
+            href="#" 
+            class="w-full border border-[#cca43b] hover:bg-white/5 text-white font-medium py-3 rounded-xl flex items-center justify-center space-x-2 transition text-sm active:scale-[0.99]"
+        >
+            <i class="fa-brands fa-google text-red-500"></i>
+            <span>Google</span>
+        </a>
+
         <div class="text-center mt-6 text-sm">
             <span class="text-gray-400">Sudah punya akun? </span>
             <a href="{{ route('login') }}" class="text-[#cca43b] hover:underline font-semibold ml-1">Masuk</a>

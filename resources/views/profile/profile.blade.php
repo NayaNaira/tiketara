@@ -16,7 +16,7 @@
 
     <header class="px-4 sm:px-8 py-6">
         <img
-            src="{{ asset('images/logo.png') }}"
+            src="{{ asset('images/logotiket.png') }}"
             alt="Tiketara"
             class="h-10">
     </header>
@@ -33,32 +33,74 @@
 
         <div class="flex flex-col items-center mb-6">
             <div class="w-28 h-28 rounded-full overflow-hidden mb-4 shadow-lg border-2 border-gray-800">
-                <img 
-                    src="https://ui-avatars.com/api/?name=Zara&background=cca43b&color=fff&size=128" 
-                    alt="User Avatar" 
-                    class="w-full h-full object-cover"
-                >
+                @if($user->avatar)
+                    @if(str_starts_with($user->avatar, 'http'))
+                        <img src="{{ $user->avatar }}" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                    @else
+                        <img src="{{ asset('storage/'.$user->avatar) }}" class="w-full h-full object-cover">
+                    @endif
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=cca43b&color=fff&size=128" class="w-full h-full object-cover">
+                @endif
             </div>
-            <h2 class="text-xl font-bold tracking-tight">Zara</h2>
-            <p class="text-gray-400 text-xs mt-0.5">zara@gmail.com</p>
+            
+            <h2 class="text-xl font-bold tracking-tight">{{ $user->name }}</h2>
+            
+            <div class="mt-1.5 mb-1">
+                @if($user->role === 'super_admin')
+                    <span class="bg-[#cca43b]/10 text-[#cca43b] border border-[#cca43b]/30 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full shadow-sm">
+                        Super Admin
+                    </span>
+                @elseif($user->role === 'promoter')
+                    <span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full shadow-sm">
+                        Promoter
+                    </span>
+                @else
+                    <span class="bg-gray-800 text-gray-400 text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full">
+                        Buyer
+                    </span>
+                @endif
+            </div>
+
+            <p class="text-gray-400 text-xs mt-0.5">{{ $user->email }}</p>
         </div>
 
-        <div class="w-full bg-[#0d1726]/60 border border-gray-800/60 rounded-xl p-4 mb-6 flex items-center justify-between shadow-sm">
-            <div class="flex-1">
-                <h3 class="text-white font-semibold text-sm">
-                    Apakah kamu ingin membuat event?
-                </h3>
-                <p class="text-gray-400 text-xxs mt-0.5">
-                    Daftarkan event mu sekarang!
-                </p>
-            </div>
-            <button class="bg-[#cca43b] w-6 h-6 rounded-full flex items-center justify-center text-black text-xs transition hover:scale-105">
-                <i class="fa-solid fa-arrow-up-right-from-square scale-75"></i>
-            </button>
-        </div>
+        @if($user->role !== 'super_admin' && $user->role !== 'promoter')
+            @if($user->promoter_status == 'none' || $user->promoter_status == 'rejected')
+                <div class="w-full bg-[#0d1726]/60 border border-gray-800/60 rounded-xl p-4 mb-6 flex items-center justify-between shadow-sm">
+                    <div class="flex-1">
+                        <h3 class="text-white font-semibold text-sm">
+                            Apakah kamu ingin membuat event?
+                        </h3>
+                        <p class="text-gray-400 text-xxs mt-0.5">
+                            {{ $user->promoter_status == 'rejected' ? 'Pengajuan ditolak. Silakan ajukan ulang berkasmu!' : 'Daftarkan event mu sekarang!' }}
+                        </p>
+                    </div>
+                    <a href="{{ route('promoter.apply') }}" class="inline-block">
+                        <button class="bg-[#cca43b] w-6 h-6 rounded-full flex items-center justify-center text-black text-xs transition hover:scale-105 cursor-pointer">
+                            <i class="fa-solid {{ $user->promoter_status == 'rejected' ? 'fa-rotate-right' : 'fa-arrow-up-right-from-square' }} scale-75"></i>
+                        </button>
+                    </a>    
+                </div>
+            @elseif($user->promoter_status == 'pending')
+                <div class="w-full bg-[#0d1726]/40 border border-yellow-600/20 rounded-xl p-4 mb-6 flex items-center justify-between shadow-sm">
+                    <div class="flex-1">
+                        <h3 class="text-yellow-500 font-semibold text-sm">
+                            Pengajuan Promoter Diproses
+                        </h3>
+                        <p class="text-gray-400 text-xxs mt-0.5">
+                            Berkas identitasmu sedang ditinjau oleh tim Super Admin.
+                        </p>
+                    </div>
+                    <div class="text-yellow-500 text-sm animate-pulse px-1">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                </div>
+            @endif
+        @endif
 
         <div class="w-full space-y-1">
-            <a href="#" class="w-full flex items-center justify-between py-3 px-1 hover:bg-white/5 rounded-lg transition group">
+            <a href="{{ route('profile.edit') }}" class="w-full flex items-center justify-between py-3 px-1 hover:bg-white/5 rounded-lg transition group">
                 <span class="text-sm font-medium text-gray-200">Edit Profile</span>
                 <i class="fa-solid fa-chevron-right text-xxs text-gray-500 group-hover:text-white transition"></i>
             </a>
@@ -66,13 +108,12 @@
             <button 
                 type="button" 
                 onclick="openLogoutModal()" 
-                class="w-full flex items-center justify-start py-3 px-1 text-red-600 hover:text-red-500 font-medium text-sm transition"
+                class="w-full flex items-center justify-start py-3 px-1 text-red-600 hover:text-red-500 font-medium text-sm transition cursor-pointer"
             >
                 Keluar
             </button>
         </div>
     </div>
-
 
     <div 
         id="logoutModal" 
@@ -88,24 +129,23 @@
                 <button 
                     type="button" 
                     onclick="closeLogoutModal()" 
-                    class="text-[#cca43b] hover:text-[#b08b30] font-medium text-sm transition focus:outline-none"
+                    class="text-[#cca43b] hover:text-[#b08b30] font-medium text-sm transition focus:outline-none cursor-pointer"
                 >
                     Batal
                 </button>
                 
-                <form action="#" method="POST" class="inline">
+                <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button 
                         type="submit" 
-                        class="text-[#cca43b] hover:text-[#b08b30] font-medium text-sm transition focus:outline-none"
+                        class="text-[#cca43b] hover:text-[#b08b30] font-medium text-sm transition focus:outline-none cursor-pointer"
                     >
                         Keluar
-                    </button>
+                     </button>
                 </form>
             </div>
         </div>
     </div>
-
 
     <script>
         const modal = document.getElementById('logoutModal');
@@ -126,7 +166,6 @@
             }, 150);
         }
 
-        // Tutup otomatis jika bagian luar kotak diklik
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeLogoutModal();

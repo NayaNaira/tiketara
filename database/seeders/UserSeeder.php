@@ -23,6 +23,7 @@ public function run(): void
         'email_verified_at' => now(),
         'status' => 'active',
         'role' => 'super_admin',
+        'promoter_status' => 'none',
         'password' => Hash::make('super_admin'),
     ]);
 
@@ -32,7 +33,7 @@ public function run(): void
         'email_verified_at' => now(),
         'status' => 'active',
         'role' => 'promoter',
-        'is_promoter_approved' => true,
+        'promoter_status' => 'approved',
         'password' => Hash::make('promoter'),
     ]);
 
@@ -42,6 +43,7 @@ public function run(): void
         'email_verified_at' => now(),
         'status' => 'active',
         'role' => 'buyer',
+        'promoter_status' => 'none',
         'password' => Hash::make('buyer'),
     ]);
 }

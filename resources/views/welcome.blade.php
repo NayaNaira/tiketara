@@ -29,12 +29,11 @@
 
         <div class="flex items-center gap-2 md:gap-4">
             @auth
-                <a href="{{ url('/dashboard') }}" class="w-7 h-7 md:w-9 md:h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-[#C9A84C] transition block">
+                <!-- LINK MENUJU HALAMAN PROFILE -->
+                <a href="{{ url('/profile') }}" class="w-7 h-7 md:w-9 md:h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-[#C9A84C] transition block">
                     @if(auth()->user()->avatar)
-                        <!-- Jika ada avatar Google, tampilkan di sini -->
                         <img src="{{ auth()->user()->avatar }}" alt="Profile" class="w-full h-full object-cover" referrerpolicy="no-referrer">
                     @else
-                        <!-- fallback jika daftar manual tanpa Google -->
                         <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=C9A84C&color=fff" alt="Profile" class="w-full h-full object-cover">
                     @endif
                 </a>
@@ -59,32 +58,33 @@
             
             <div class="flex overflow-x-auto gap-3 md:gap-5 pb-6 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 
-                @php
-                    $images = [
-                        asset('images/card_konser1.jpg.jpeg'),
-                        asset('images/card_konser2.webp'),
-                        asset('images/card_konser3.webp'),
-                        asset('images/card_konser4.jpg.jpeg'),
-                        asset('images/card_konser5.webp'),
-                        asset('images/card_konser6.webp')
-                    ];
-                @endphp
-
-                @foreach ($images as $img)
-                <div class="min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px] snap-start group cursor-pointer flex flex-col">
+                <!-- LOOPING DATA EVENT DINAMIS DARI DATABASE -->
+                @forelse ($events as $event)
+                <a href="{{ url('/event/' . $event->id) }}" class="min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px] snap-start group cursor-pointer flex flex-col block">
                     <div class="h-40 md:h-48 rounded-2xl overflow-hidden relative mb-4">
-                        <img src="{{ $img }}" alt="Event" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <!-- Asumsi nama field gambarnya adalah 'image' atau 'poster' -->
+                        <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
                     
-                    <h3 class="font-bold text-base md:text-lg mb-1 text-white">World Tour 2026</h3>
-                    <p class="text-xs md:text-sm text-[#DADADA] mb-4 opacity-90">14 Juli 2026 • Jakarta Pusat</p>
+                    <h3 class="font-bold text-base md:text-lg mb-1 text-white">{{ $event->title }}</h3>
+                    
+                    <!-- Format Tanggal dan Lokasi -->
+                    <p class="text-xs md:text-sm text-[#DADADA] mb-4 opacity-90">
+                        {{ \Carbon\Carbon::parse($event->event_date)->translatedFormat('d F Y') }} • {{ $event->venue ?? 'TBA' }}
+                    </p>
                     
                     <div class="h-[1px] w-full bg-[#1A2639] mb-4"></div>
                     
                     <div class="flex justify-between items-center mt-auto pb-2">
                         <div>
                             <p class="text-[11px] md:text-xs text-[#DADADA] mb-1 opacity-90">Mulai dari</p>
-                            <p class="text-[#C9A84C] font-bold text-base md:text-lg tracking-wide">Rp 850.000</p>
+                            <!-- Mengambil harga termurah dari relasi ticketTypes -->
+                            @php
+                                $minPrice = $event->ticketTypes ? $event->ticketTypes->min('price') : 0;
+                            @endphp
+                            <p class="text-[#C9A84C] font-bold text-base md:text-lg tracking-wide">
+                                Rp {{ number_format($minPrice, 0, ',', '.') }}
+                            </p>
                         </div>
                         <div class="bg-[#C9A84C] w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-white group-hover:scale-110 transition shadow-md">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 md:w-5 md:h-5">
@@ -92,8 +92,13 @@
                             </svg>
                         </div>
                     </div>
+                </a>
+                @empty
+                <div class="w-full text-center py-8">
+                    <p class="text-gray-500 italic">Belum ada acara yang tersedia saat ini.</p>
                 </div>
-                @endforeach
+                @endforelse
+                
             </div>
         </div>
 

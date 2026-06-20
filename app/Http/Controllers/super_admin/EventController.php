@@ -23,7 +23,7 @@ class EventController extends Controller
             ->latest()
             ->get();
 
-        return view('super.event.index', compact('events')); 
+        return view('super.events.index', compact('events')); 
     }
 
     /**
@@ -37,7 +37,7 @@ class EventController extends Controller
             'ticketTypes'
         ])->findOrFail($id);
 
-        return view('super.event.show', compact('event'));
+        return view('super.events.show', compact('event'));
     }
 
     /**

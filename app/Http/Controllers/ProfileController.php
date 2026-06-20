@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -15,7 +16,15 @@ class ProfileController extends Controller
         return view('profile.profile', compact('user'));
     }
 
-    // Update profile
+    // Tampilkan halaman edit profile
+    public function edit()
+    {
+        $user = Auth::user();
+        
+        return view('profile.edit-profile', compact('user'));
+    }
+
+    // Update profile biasa
     public function update(Request $request)
     {
        /** @var \App\Models\User $user */
@@ -29,12 +38,13 @@ class ProfileController extends Controller
             'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        // Upload avatar
+        // Upload avatar & hapus yang lama agar storage bersih
         if ($request->hasFile('avatar')) {
+            if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
+                Storage::disk('public')->delete($user->avatar);
+            }
 
-            $path = $request->file('avatar')
-                ->store('avatars', 'public');
-
+            $path = $request->file('avatar')->store('avatars', 'public');
             $validated['avatar'] = $path;
         }
 
@@ -43,5 +53,59 @@ class ProfileController extends Controller
         return redirect()
             ->route('profile.index')
             ->with('success', 'Profile berhasil diperbarui');
+    }
+
+    // ==========================================================
+    // 💥 BERIKUT FUNGSI TAMBAHAN UNTUK PENGAJUAN PROMOTER 💥
+    // ==========================================================
+
+    /**
+     * Tampilkan halaman form apply promoter
+     */
+    public function applyPromoter()
+    {
+        $user = Auth::user();
+
+        // Proteksi: Jika sudah pending atau approved, jangan kasih masuk lagi
+        if (!in_array($user->promoter_status, ['none', 'rejected'])) {
+            return redirect()->route('profile.index')->with('info', 'Anda sudah mengajukan atau telah menjadi promoter.');
+        }
+
+        return view('profile.apply-promoter', compact('user'));
+    }
+
+    /**
+     * Proses simpan data apply promoter
+     */
+    public function storePromoterApplication(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Validasi input form pengajuan
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'nik' => 'required|string|max:16',
+            'phone_number' => 'required|string|max:20',
+            'address' => 'required|string',
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        // Upload logo instansi promoter & bersihkan file lama
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        // Ubah status pengajuan menjadi pending
+        $validated['promoter_status'] = 'pending';
+
+        $user->update($validated);
+
+        return redirect()
+            ->route('profile.index')
+            ->with('success', 'Pengajuan promoter berhasil dikirim! Menunggu konfirmasi admin.');
     }
 }

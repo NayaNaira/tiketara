@@ -53,7 +53,7 @@
             </p>
 
             <div class="flex justify-center">
-                <a href="{{ url('/dashboard') }}" class="w-full max-w-[320px] bg-[#C9A84C] hover:bg-[#b59540] active:scale-95 text-[#020D1A] font-bold py-3.5 px-6 rounded-full transition-all duration-200 text-center text-sm md:text-base tracking-wider shadow-lg block">
+                <a href="{{ url('/') }}" class="w-full max-w-[320px] bg-[#C9A84C] hover:bg-[#b59540] active:scale-95 text-[#020D1A] font-bold py-3.5 px-6 rounded-full transition-all duration-200 text-center text-sm md:text-base tracking-wider shadow-lg block">
                     Lanjutkan
                 </a>
             </div>

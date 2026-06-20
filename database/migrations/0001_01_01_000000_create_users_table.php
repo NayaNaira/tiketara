@@ -36,8 +36,8 @@ return new class extends Migration
              $table->string('nik', 16)->nullable()->unique();
              $table->text('address')->nullable();
              $table->string('phone_number', 20)->nullable();
-
-             $table->boolean('is_promoter_approved')->default(false);
+             // GANTI 'is_promoter_approved' MENJADI ENUM STATUS INI:
+             $table->enum('promoter_status', ['none', 'pending', 'approved', 'rejected'])->default('none');
 
              $table->timestamps();
 });

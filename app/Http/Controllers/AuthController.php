@@ -53,7 +53,7 @@ class AuthController extends Controller
         return match ($user->role) {
             'super_admin' => redirect('/super'),
             'promoter' => redirect('/promoter'),
-            default => redirect('/dashboard'),
+            default => redirect('/'),
         };
     }
 
@@ -88,7 +88,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         // Langsung lempar ke dashboard buyer dengan pesan sukses estetis
-        return redirect('/dashboard')->with('success', 'Registrasi Berhasil! Akun Anda telah otomatis diverifikasi melalui Google SMTP.');
+        return redirect('/')->with('success', 'Registrasi Berhasil! Akun Anda telah otomatis diverifikasi melalui Google SMTP.');
     }
 
     /**
