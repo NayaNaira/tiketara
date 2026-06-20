@@ -2,24 +2,24 @@
 @section('title', 'Export Laporan')
 
 @section('content')
-<header class="p-8 pb-4">
+<header class="p-4 lg:p-8 pb-2 lg:pb-4">
     <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Export Laporan</h1>
     <p class="text-sm text-[#4A9FD4]">Konfigurasi dan unduh berkas rekapitulasi performa platform</p>
 </header>
 
-<div class="flex-1 p-8 pt-0 overflow-y-auto">
+<div class="flex-1 p-4 lg:p-8 lg:pt-0 pt-0 overflow-y-auto">
     {{-- Hitungan data agregat asli dari data event untuk keperluan preview --}}
     @php
-        $ticketPaidCount = $event->orders ? $event->orders->where('status', 'paid')->sum('quantity') : 0;
-        $totalRevenue = $event->orders ? $event->orders->where('status', 'paid')->sum('total_amount') : 0;
-        $maxCapacity = $event->ticketTypes ? $event->ticketTypes->sum('capacity') : 0;
+        $ticketPaidCount = $event ? ($event->orders ? $event->orders->where('status', 'paid')->sum('quantity') : 0) : $stats['total_tickets'];
+        $totalRevenue = $event ? ($event->orders ? $event->orders->where('status', 'paid')->sum('total_amount') : 0) : $stats['total_revenue'];
+        $maxCapacity = $event ? ($event->ticketTypes ? $event->ticketTypes->sum('quota') : 0) : 0;
         
         // Menghitung rasio sukses penjualan tiket asli
-        $successRatio = $maxCapacity > 0 ? round(($ticketPaidCount / $maxCapacity) * 100, 1) : 0;
+        $successRatio = $event ? ($maxCapacity > 0 ? round(($ticketPaidCount / $maxCapacity) * 100, 1) : 0) : $stats['success_ratio'];
     @endphp
 
     <form action="{{ route('super.export') }}" method="GET" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <input type="hidden" name="event_id" value="{{ $event->id }}">
+        <input type="hidden" name="event_id" value="{{ $event->id ?? '' }}">
         
         <div class="lg:col-span-5 bg-[#041830] rounded-xl border border-[#4A9FD4]/30 p-6 flex flex-col justify-between min-h-[500px]">
             <div>
@@ -29,14 +29,19 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-[#DADADA] text-xs font-medium mb-2">Nama Acara Terpilih</label>
-                        <input type="text" readonly value="{{ $event->title }}" class="w-full bg-[#020D1A]/50 border border-[#4A9FD4]/30 rounded-lg p-2.5 text-sm text-gray-400 focus:outline-none">
+                        <input type="text" readonly value="{{ $event->title ?? 'Semua Acara (Laporan Global)' }}" class="w-full bg-[#020D1A]/50 border border-[#4A9FD4]/30 rounded-lg p-2.5 text-sm text-gray-400 focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-[#DADADA] text-xs font-medium mb-2">Periode Tahun</label>
                         <div class="relative max-w-[250px]">
                             <select name="period_year" class="w-full bg-[#020D1A] border border-[#4A9FD4]/50 rounded-lg py-2 pl-8 pr-3 text-sm text-[#DADADA] appearance-none focus:outline-none focus:border-[#4A9FD4]">
-                                <option value="{{ \Carbon\Carbon::parse($event->event_date)->format('Y') }}">{{ \Carbon\Carbon::parse($event->event_date)->format('Y') }}</option>
+                                @if($event)
+                                    <option value="{{ \Carbon\Carbon::parse($event->event_date)->format('Y') }}">{{ \Carbon\Carbon::parse($event->event_date)->format('Y') }}</option>
+                                @else
+                                    <option value="2026">2026</option>
+                                    <option value="2025">2025</option>
+                                @endif
                             </select>
                             <div class="absolute left-3 top-3 pointer-events-none">
                                 <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -119,14 +124,20 @@
                     <div class="mb-6">
                         <p class="text-[8px] text-gray-400 font-bold tracking-widest uppercase mb-2">PROGRESIVITAS GRAFIK PENJUALAN EVENT</p>
                         <div class="flex items-end justify-between gap-2 h-20 border-b border-[#202020] pb-1">
-                            {{-- Visualisasi bar grafik buatan mengikuti skala persentase rasio keberhasilan penjualan --}}
-                            @for($i = 1; $i <= 12; $i++)
-                                @php 
-                                    $simulatedHeight = $successRatio > 0 ? ($successRatio / 12) * $i : 5;
-                                    if($simulatedHeight > 100) $simulatedHeight = 100;
-                                @endphp
-                                <div class="w-full bg-[#C9A84C]/80 hover:bg-[#C9A84C] transition-all rounded-t-sm" style="height: {{ $simulatedHeight }}%"></div>
-                            @endfor
+                            @if(isset($monthlyData))
+                                @foreach($monthlyData as $height)
+                                    <div class="w-full bg-[#C9A84C]/80 hover:bg-[#C9A84C] transition-all rounded-t-sm" style="height: {{ $height }}%"></div>
+                                @endforeach
+                            @else
+                                {{-- Visualisasi bar grafik buatan mengikuti skala persentase rasio keberhasilan penjualan --}}
+                                @for($i = 1; $i <= 12; $i++)
+                                    @php 
+                                        $simulatedHeight = $successRatio > 0 ? ($successRatio / 12) * $i : 5;
+                                        if($simulatedHeight > 100) $simulatedHeight = 100;
+                                    @endphp
+                                    <div class="w-full bg-[#C9A84C]/80 hover:bg-[#C9A84C] transition-all rounded-t-sm" style="height: {{ $simulatedHeight }}%"></div>
+                                @endfor
+                            @endif
                         </div>
                     </div>
 
@@ -143,18 +154,17 @@
                                 </thead>
                                 <tbody class="text-[#DADADA] divide-y divide-[#202020]">
                                     {{-- LOOPING DATA TICKET TYPES ASLI DARI EVENT --}}
-                                    @forelse($event->ticketTypes ?? [] as $type)
+                                    @forelse(isset($event) ? ($event->ticketTypes ?? []) : [] as $type)
                                         @php
-                                            // Menghitung tiket terjual khusus kategori/type ini
-                                            $typeSold = $event->orders ? $event->orders->where('status', 'paid')->flatMap->ticketDetails->where('ticket_type_id', $type->id)->count() : 0;
-                                            $availableStock = $type->capacity - $typeSold;
+                                            $typeSold = $event && $event->orders ? $event->orders->where('status', 'paid')->where('ticket_type_id', $type->id)->sum('quantity') : 0;
+                                            $availableStock = $type->quota - $typeSold;
                                         @endphp
                                         <tr>
                                             <td class="py-1.5 px-2 font-medium text-white">{{ $type->name }}</td>
                                             <td class="py-1.5 px-2">Rp {{ number_format($type->price, 0, ',', '.') }}</td>
                                             <td class="py-1.5 px-2">
                                                 <span class="{{ $availableStock < 10 ? 'text-red-400 font-bold' : 'text-gray-300' }}">
-                                                    {{ number_format($availableStock) }} Sisa / {{ number_format($type->capacity) }}
+                                                    {{ number_format($availableStock) }} Sisa / {{ number_format($type->quota) }}
                                                 </span>
                                             </td>
                                         </tr>
@@ -184,8 +194,8 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-300 font-medium">Laporan_Eksklusif_{{ Str::slug($event->title, '_') }}_2026.pdf</p>
-                        <p class="text-[10px] text-gray-500">Berkas dikunci otomatis berdasarkan target ID data: #{{ $event->id }}</p>
+                        <p class="text-xs text-gray-300 font-medium">Laporan_Eksklusif_{{ Str::slug($event->title ?? 'Global', '_') }}_2026.pdf</p>
+                        <p class="text-[10px] text-gray-500">Berkas dikunci otomatis berdasarkan target ID data: #{{ $event->id ?? 'Global' }}</p>
                     </div>
                 </div>
             </div>

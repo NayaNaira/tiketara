@@ -100,6 +100,24 @@
         @endif
 
         <div class="w-full space-y-1">
+            @if($user->role === 'super_admin')
+            <a href="{{ route('super.dashboard') }}" class="w-full flex items-center justify-between py-3 px-1 hover:bg-white/5 rounded-lg transition group">
+                <span class="text-sm font-medium text-[#cca43b] flex items-center gap-2">
+                    <i class="fa-solid fa-gauge text-xs"></i> Dashboard Admin
+                </span>
+                <i class="fa-solid fa-chevron-right text-xxs text-[#cca43b]/70 group-hover:text-[#cca43b] transition"></i>
+            </a>
+            @endif
+
+            @if($user->role === 'promoter')
+            <a href="{{ route('promoter.dashboard') }}" class="w-full flex items-center justify-between py-3 px-1 hover:bg-white/5 rounded-lg transition group">
+                <span class="text-sm font-medium text-[#4A9FD4] flex items-center gap-2">
+                    <i class="fa-solid fa-gauge text-xs"></i> Dashboard Penyelenggara
+                </span>
+                <i class="fa-solid fa-chevron-right text-xxs text-[#4A9FD4]/70 group-hover:text-[#4A9FD4] transition"></i>
+            </a>
+            @endif
+
             <a href="{{ route('profile.edit') }}" class="w-full flex items-center justify-between py-3 px-1 hover:bg-white/5 rounded-lg transition group">
                 <span class="text-sm font-medium text-gray-200">Edit Profile</span>
                 <i class="fa-solid fa-chevron-right text-xxs text-gray-500 group-hover:text-white transition"></i>

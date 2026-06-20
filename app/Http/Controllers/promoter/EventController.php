@@ -24,6 +24,11 @@ class EventController extends Controller
         return view('promoter.events.index', compact('events')); 
     }
 
+    public function create()
+    {
+        return view('promoter.events.create');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -98,7 +103,7 @@ class EventController extends Controller
             abort(403, 'Event yang sudah berstatus pending/approved/rejected tidak dapat diubah.');
         }
 
-        return view('promoter.events.index', compact('editEvent'));
+        return view('promoter.events.edit', compact('editEvent'));
     }
 
     public function update(Request $request, $id)
@@ -113,7 +118,7 @@ class EventController extends Controller
         // ==========================================
         // FITUR "AJUKAN" (Ubah status dari draft -> pending)
         // ==========================================
-        if ($request->has('status') && !$request->has('title')) {
+        if ($request->has('status') && $request->get('status') === 'pending' && !$request->has('title')) {
             $event->update(['status' => 'pending']);
             return back()->with('success', 'Event berhasil diajukan ke Admin untuk di-review.');
         }
@@ -123,13 +128,26 @@ class EventController extends Controller
         // ==========================================
         $validated = $request->validate([
             'title' => 'required|max:150',
-            // ... (validasi lainnya sama dengan store)
-            'poster' => 'nullable|image|max:2048', // Poster nullable saat edit
+            'description' => 'required',
+            'category' => 'required',
+            'venue_name' => 'required',
+            'address' => 'required',
+            'city' => 'required',
+            'event_date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'max_ticket_per_order' => 'required|integer|min:1',
+            'terms_and_conditions' => 'required',
+            'poster' => 'nullable|image|max:2048',
+            // Validasi array untuk tiket
+            'ticket_name' => 'required|array',
+            'ticket_name.*' => 'required|string',
+            'ticket_type_price.*' => 'required|numeric|min:0',
         ]);
 
         try {
-            DB::transaction(function () use ($request, $event) {
-                $updateData = $request->except(['_token', '_method', 'poster', 'ticket_name', 'ticket_type_price', 'ticket_type_quota', 'start_sale', 'end_sale', 'gallery']);
+            DB::transaction(function () use ($request, $event, $validated) {
+                $updateData = $request->except(['_token', '_method', 'poster', 'ticket_name', 'ticket_type_price', 'ticket_type_quota', 'start_sale', 'end_sale', 'gallery', 'artist_dummy', 'genre_dummy']);
                 
                 // 1. Update Poster jika ada file baru
                 if ($request->hasFile('poster')) {
@@ -169,6 +187,40 @@ class EventController extends Controller
             return redirect()->route('promoter.event.index')->with('success', 'Draft Event berhasil diperbarui.');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Gagal mengupdate data: ' . $e->getMessage()]);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $event = Event::where('promoter_id', Auth::id())->findOrFail($id);
+
+        if ($event->status !== 'draft') {
+            return back()->withErrors(['error' => 'Hanya event dengan status draft yang dapat dihapus.']);
+        }
+
+        try {
+            DB::transaction(function () use ($event) {
+                // Hapus ticket types
+                $event->ticketTypes()->delete();
+
+                // Hapus gallery files & records
+                foreach ($event->galleries as $gallery) {
+                    Storage::disk('public')->delete($gallery->image_path);
+                    $gallery->delete();
+                }
+
+                // Hapus poster file
+                if ($event->poster_path) {
+                    Storage::disk('public')->delete($event->poster_path);
+                }
+
+                // Hapus event
+                $event->delete();
+            });
+
+            return redirect()->route('promoter.event.index')->with('success', 'Draft event berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus event: ' . $e->getMessage()]);
         }
     }
 

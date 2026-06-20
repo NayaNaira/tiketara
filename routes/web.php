@@ -110,8 +110,7 @@ Route::middleware('auth')->group(function () {
 | PROTECTED DASHBOARD ROUTES (SHARED ACCESSIBILITY)
 |--------------------------------------------------------------------------
 */
-Route::get('/promoter', fn () => view('.dashboard'))
-    ->middleware(['auth', 'role:promoter,super_admin']);
+// Promoter dashboard routes are defined under the promoter group prefix below
 
 Route::get('/dashboard', fn () => view('dashboard'))
     ->middleware(['auth', 'role:buyer,promoter,super_admin']);
@@ -161,12 +160,18 @@ Route::middleware(['auth'])->group(function () {
     // PROMOTER GROUP
     // ====================================================================
     Route::group(['prefix' => 'promoter', 'as' => 'promoter.', 'middleware' => ['role:promoter']], function() {
+        Route::get('/', [App\Http\Controllers\promoter\PromoterDashboardController::class, 'summary'])->name('dashboard');
         Route::get('/event', [PromoterEventController::class, 'index'])->name('event.index');
         Route::post('/event', [PromoterEventController::class, 'store'])->name('event.store');
+        Route::get('/event/create', [PromoterEventController::class, 'create'])->name('event.create');
         Route::get('/event/{id}/edit', [PromoterEventController::class, 'edit'])->name('event.edit');
         Route::put('/event/{id}', [PromoterEventController::class, 'update'])->name('event.update');
         Route::delete('/event/{id}', [PromoterEventController::class, 'destroy'])->name('event.destroy');
         Route::delete('/gallery/{id}', [PromoterEventController::class, 'deleteGallery'])->name('event.deleteGallery');
+
+        // Reports
+        Route::get('/reports', [App\Http\Controllers\promoter\PromoterDashboardController::class, 'reports'])->name('reports');
+        Route::get('/reports/export', [App\Http\Controllers\promoter\PromoterDashboardController::class, 'export'])->name('reports.export');
     });
 
     // ====================================================================

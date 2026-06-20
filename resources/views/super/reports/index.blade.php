@@ -2,12 +2,12 @@
 @section('title', 'Laporan')
 
 @section('content')
-<header class="p-8 pb-4">
+<header class="p-4 lg:p-8 pb-2 lg:pb-4">
     <h1 class="text-2xl font-bold text-[#C9A84C] mb-1">Laporan</h1>
     <p class="text-sm text-[#4A9FD4]">Kelola semua acara yang terdaftar di platform</p>
 </header>
 
-<div class="flex-1 p-8 pt-0 overflow-y-auto">
+<div class="flex-1 p-4 lg:p-8 lg:pt-0 pt-0 overflow-y-auto">
     
     <div class="flex flex-wrap gap-4 mb-6 items-center">
         <div class="relative flex-1 min-w-[200px]">

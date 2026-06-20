@@ -122,6 +122,14 @@
     </div>
 
     <table class="meta-info">
+        @if(isset($event) && $event)
+        <tr>
+            <td style="width: 15%;"><strong>Nama Acara</strong></td>
+            <td style="width: 35%;">: {{ $event->title }}</td>
+            <td style="width: 15%;"><strong>Kategori</strong></td>
+            <td style="width: 35%;">: {{ $event->category }}</td>
+        </tr>
+        @endif
         <tr>
             <td style="width: 15%;"><strong>Periode Rekap</strong></td>
             <td style="width: 35%;">: Tahunan (Tahun Rekap {{ $year }})</td>
