@@ -21,7 +21,6 @@ use App\Http\Controllers\super_admin\EventController as SuperEventController;
 use App\Http\Controllers\super_admin\AdminController; 
 use App\Http\Controllers\super_admin\ReportController;
 
-
 // Import Controller Promoter
 use App\Http\Controllers\promoter\EventController as PromoterEventController;
 
@@ -32,10 +31,18 @@ use App\Http\Controllers\promoter\EventController as PromoterEventController;
 */
 
 Route::get('/', function () {
-    $events = Event::with('ticketTypes'); 
-
+    $events = Event::with('ticketTypes')->get(); 
     return view('welcome', compact('events'));
 });
+
+// Detail Event
+Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
+
+
+// Midtrans Payment
+Route::post('/buyer/payment/notification', [App\Http\Controllers\buyer\EventController::class, 'paymentNotification']);
+
+
 /*
 |--------------------------------------------------------------------------
 | AUTHENTICATION ROUTES
@@ -129,7 +136,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/export', [DashboardController::class, 'export'])->name('export');
         Route::get('/reports/{id}', [DashboardController::class, 'showReport'])->name('reports.detail');
         
-        // Transactions Management (Sudah disinkronkan namanya ke .eventList)
+        // Transactions Management
         Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
         Route::get('/transactions/event/{id}', [TransactionController::class, 'eventList'])->name('transactions.eventList');
         Route::get('/transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
@@ -146,9 +153,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/promoter-requests/{id}/action', [AdminController::class, 'handlePromoterRequest'])->name('promoter.action');
         
         // Export Laporan
-        Route::get('/super/report', [ReportController::class, 'index'])->name('super.report');
-        Route::get('/super/report/export', [ReportController::class, 'export'])->name('super.export');
-        
+        Route::get('/report', [ReportController::class, 'index'])->name('report');
+        Route::get('/report/export', [ReportController::class, 'export'])->name('export');
     });
 
     // ====================================================================
@@ -159,6 +165,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/event', [PromoterEventController::class, 'store'])->name('event.store');
         Route::get('/event/{id}/edit', [PromoterEventController::class, 'edit'])->name('event.edit');
         Route::put('/event/{id}', [PromoterEventController::class, 'update'])->name('event.update');
+        Route::delete('/event/{id}', [PromoterEventController::class, 'destroy'])->name('event.destroy');
         Route::delete('/gallery/{id}', [PromoterEventController::class, 'deleteGallery'])->name('event.deleteGallery');
     });
 
@@ -167,7 +174,17 @@ Route::middleware(['auth'])->group(function () {
     // ====================================================================
     Route::group(['prefix' => 'buyer', 'as' => 'buyer.', 'middleware' => ['role:buyer']], function() {
         Route::get('/event', [BuyerEventController::class, 'index'])->name('event.index');
-        Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
+
+        // STEP 1: Pilih Kategori & Jumlah Tiket
+        Route::get('/event/{id}/select-ticket', [BuyerEventController::class, 'selectTicket'])->name('ticket.select');
+        Route::post('/event/{id}/select-ticket', [BuyerEventController::class, 'saveTicketSelection'])->name('ticket.select.store');
+        
+        // STEP 2: Isi Data Diri Pemegang Tiket
+        Route::get('/event/{id}/checkout', [BuyerEventController::class, 'checkoutForm'])->name('checkout.form');
+        Route::post('/event/{id}/checkout', [BuyerEventController::class, 'checkoutStore'])->name('checkout.store');
+
+        // STEP 3: Ringkasan & Metode Pembayaran
+        Route::get('/event/booking/payment', [BuyerEventController::class, 'paymentPage'])->name('payment.page');
     });
 
     // ====================================================================

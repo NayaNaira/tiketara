@@ -21,7 +21,7 @@ class EventController extends Controller
             ->latest()
             ->get();
 
-        return view('promoter.event.index', compact('events')); 
+        return view('promoter.events.index', compact('events')); 
     }
 
     public function store(Request $request)
@@ -39,22 +39,53 @@ class EventController extends Controller
             'max_ticket_per_order' => 'required|integer|min:1',
             'terms_and_conditions' => 'required',
             'poster' => 'required|image|max:2048',
+            // Validasi array untuk tiket
+            'ticket_name' => 'required|array',
+            'ticket_name.*' => 'required|string',
+            'ticket_type_price.*' => 'required|numeric|min:0',
         ]);
 
         try {
             DB::transaction(function () use ($request, $validated) {
+                // 1. Simpan Poster & Event
                 $posterPath = $request->file('poster')->store('events/posters', 'public');
                 $validated['poster_path'] = $posterPath;
                 $validated['promoter_id'] = Auth::id();
-                $validated['status'] = 'draft'; // Sesuai permintaan: default berstatus draft saat dibuat
+                $validated['status'] = 'draft';
 
                 $event = Event::create($validated);
-                // Tambahkan perulangan tiket & gallery bawaan Anda di sini jika ada...
+
+                // 2. Simpan Tiket (Looping berdasarkan array)
+                if ($request->has('ticket_name')) {
+                    foreach ($request->ticket_name as $index => $name) {
+                        TicketType::create([
+                            'event_id' => $event->id,
+                            'name' => $name,
+                            'price' => $request->ticket_type_price[$index],
+                            'quota' => $request->ticket_type_quota[$index],
+                            'start_sale' => $request->start_sale[$index],
+                            'end_sale' => $request->end_sale[$index],
+                        ]);
+                    }
+                }
+
+                // 3. Simpan Gallery (Jika ada multiple upload)
+                if ($request->hasFile('gallery')) {
+                    foreach ($request->file('gallery') as $image) {
+                        $path = $image->store('events/galleries', 'public');
+                        EventGallery::create([
+                            'event_id' => $event->id,
+                            'image_path' => $path,
+                        ]);
+                    }
+                }
             });
 
-            return response()->json(['success' => true, 'message' => 'Draft event berhasil dibuat.'], 201);
+            // Ganti JSON ke Redirect agar form HTML kembali ke tampilan web
+            return redirect()->route('promoter.event.index')->with('success', 'Draft event beserta tiket berhasil dibuat.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            // Kalau gagal, kembalikan ke form beserta errornya
+            return back()->withInput()->withErrors(['error' => 'Gagal menyimpan data: ' . $e->getMessage()]);
         }
     }
 
@@ -62,12 +93,12 @@ class EventController extends Controller
     {
         $editEvent = Event::where('promoter_id', Auth::id())->findOrFail($id);
 
-        // KUNCI AKSES: Jika sudah diajukan ke admin, tidak boleh diedit lagi
+        // KUNCI AKSES
         if ($editEvent->status !== 'draft') {
             abort(403, 'Event yang sudah berstatus pending/approved/rejected tidak dapat diubah.');
         }
 
-        return view('promoter.event.edit', compact('editEvent'));
+        return view('promoter.events.index', compact('editEvent'));
     }
 
     public function update(Request $request, $id)
@@ -76,12 +107,69 @@ class EventController extends Controller
 
         // KUNCI AKSES (BACKEND SECURITY)
         if ($event->status !== 'draft') {
-            return response()->json(['success' => false, 'message' => 'Event ini sudah dikunci dan tidak bisa diedit.'], 403);
+            return back()->withErrors(['error' => 'Event ini sudah dikunci dan tidak bisa diedit.']);
         }
 
-        // Jalankan logika transaksi update data, ticketTypes, dan gallery bawaan Anda di sini
-        // ...
-        return response()->json(['success' => true, 'message' => 'Draft Event berhasil diperbarui.']);
+        // ==========================================
+        // FITUR "AJUKAN" (Ubah status dari draft -> pending)
+        // ==========================================
+        if ($request->has('status') && !$request->has('title')) {
+            $event->update(['status' => 'pending']);
+            return back()->with('success', 'Event berhasil diajukan ke Admin untuk di-review.');
+        }
+
+        // ==========================================
+        // FITUR "UPDATE FORM EDIT"
+        // ==========================================
+        $validated = $request->validate([
+            'title' => 'required|max:150',
+            // ... (validasi lainnya sama dengan store)
+            'poster' => 'nullable|image|max:2048', // Poster nullable saat edit
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $event) {
+                $updateData = $request->except(['_token', '_method', 'poster', 'ticket_name', 'ticket_type_price', 'ticket_type_quota', 'start_sale', 'end_sale', 'gallery']);
+                
+                // 1. Update Poster jika ada file baru
+                if ($request->hasFile('poster')) {
+                    if ($event->poster_path) Storage::disk('public')->delete($event->poster_path);
+                    $updateData['poster_path'] = $request->file('poster')->store('events/posters', 'public');
+                }
+
+                $event->update($updateData);
+
+                // 2. Update TicketTypes (Hapus yang lama, simpan yang baru dari form)
+                if ($request->has('ticket_name')) {
+                    $event->ticketTypes()->delete();
+                    foreach ($request->ticket_name as $index => $name) {
+                        TicketType::create([
+                            'event_id' => $event->id,
+                            'name' => $name,
+                            'price' => $request->ticket_type_price[$index],
+                            'quota' => $request->ticket_type_quota[$index],
+                            'start_sale' => $request->start_sale[$index],
+                            'end_sale' => $request->end_sale[$index],
+                        ]);
+                    }
+                }
+
+                // 3. Tambah foto ke Gallery lama jika ada
+                if ($request->hasFile('gallery')) {
+                    foreach ($request->file('gallery') as $image) {
+                        $path = $image->store('events/galleries', 'public');
+                        EventGallery::create([
+                            'event_id' => $event->id,
+                            'image_path' => $path,
+                        ]);
+                    }
+                }
+            });
+
+            return redirect()->route('promoter.event.index')->with('success', 'Draft Event berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Gagal mengupdate data: ' . $e->getMessage()]);
+        }
     }
 
     public function deleteGallery($id)

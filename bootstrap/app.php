@@ -12,9 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-         $middleware->alias([
-         'role' => \App\Http\Middleware\RoleMiddleware::class,
-         ]);
+        // 1. Alias Middleware yang sudah kamu buat sebelumnya
+        $middleware->alias([
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+
+        // 2. TAMBAHKAN INI: Kecualikan rute webhook Midtrans dari pemeriksaan CSRF Token
+        $middleware->validateCsrfTokens(except: [
+            '/buyer/payment/notification',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

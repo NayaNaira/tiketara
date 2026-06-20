@@ -60,10 +60,10 @@
                 
                 <!-- LOOPING DATA EVENT DINAMIS DARI DATABASE -->
                 @forelse ($events as $event)
-                <a href="{{ url('/event/' . $event->id) }}" class="min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px] snap-start group cursor-pointer flex flex-col block">
+                <a href="{{ route('event.show', $event->id) }}" class="min-w-[240px] w-[240px] md:min-w-[280px] md:w-[280px] snap-start group cursor-pointer flex flex-col block">
                     <div class="h-40 md:h-48 rounded-2xl overflow-hidden relative mb-4">
                         <!-- Asumsi nama field gambarnya adalah 'image' atau 'poster' -->
-                        <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <img src="{{ asset('storage/' . $event->poster_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
                     
                     <h3 class="font-bold text-base md:text-lg mb-1 text-white">{{ $event->title }}</h3>
