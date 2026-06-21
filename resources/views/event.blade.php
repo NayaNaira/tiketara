@@ -199,7 +199,7 @@
     <label>Poster</label><br>
 
     @if(isset($editEvent) && $editEvent->poster_path)
-        <img src="{{ asset('storage/' . $editEvent->poster_path) }}"
+        <img src="{{ $editEvent->poster_url }}"
              width="120"><br>
         <small>Poster saat ini</small><br><br>
     @endif
@@ -217,7 +217,7 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
             @foreach($editEvent->galleries as $gallery)
                 <div style="position:relative;">
-                    <img src="{{ asset('storage/' . $gallery->image_path) }}"
+                    <img src="{{ $gallery->image_url }}"
                          width="100"
                          style="border-radius:8px;">
 
@@ -330,7 +330,7 @@
         @if($event->poster_path)
 
             <img
-                src="{{ asset('storage/'.$event->poster_path) }}"
+                src="{{ $event->poster_url }}"
                 width="120"
             >
 
@@ -343,7 +343,7 @@
         @foreach($event->galleries as $image)
 
             <img
-                src="{{ asset('storage/'.$image->image_path) }}"
+                src="{{ $image->image_url }}"
                 width="80"
             >
 

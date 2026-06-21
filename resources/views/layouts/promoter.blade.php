@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penyelenggara - @yield('title', 'Dashboard')</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logotiket.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=playfair-display:400,600,700|dm-sans:400,500,700" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -29,7 +30,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
-            <img src="{{ asset('images/logotiket.png') }}" alt="Logo" class="h-12 mb-2 object-contain">
+            <a href="{{ url('/') }}" class="block hover:opacity-90 transition">
+                <img src="{{ asset('images/logotiket.png') }}" alt="Logo" class="h-12 mb-2 object-contain">
+            </a>
             <span class="text-white text-sm font-medium tracking-wide">Penyelenggara</span>
         </div>
 
@@ -101,10 +104,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
-            <div class="flex items-center gap-2">
+            <a href="{{ url('/') }}" class="flex items-center gap-2 hover:opacity-90 transition">
                 <img src="{{ asset('images/logotiket.png') }}" alt="Logo" class="h-8 object-contain">
                 <span class="text-xs font-semibold tracking-wide">Penyelenggara</span>
-            </div>
+            </a>
             <div class="w-8"></div>
         </header>
 

@@ -15,10 +15,12 @@
 
     <!-- Header -->
     <header class="px-4 sm:px-8 py-6">
-        <img
-            src="{{ asset('images/logotiket.png') }}"
-            alt="Tiketara"
-            class="h-10">
+        <a href="{{ url('/') }}" class="inline-block hover:opacity-90 transition">
+            <img
+                src="{{ asset('images/logotiket.png') }}"
+                alt="Tiketara"
+                class="h-10">
+        </a>
     </header>
 
     <!-- Content -->
@@ -80,7 +82,7 @@
     <footer class="pb-6 text-center">
 
         <p class="text-white text-xs">
-            ©2026 TicketFlow Management Systems.
+            ©2026 Tiketara.
             All rights reserved.
         </p>
 

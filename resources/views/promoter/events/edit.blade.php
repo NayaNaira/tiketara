@@ -101,10 +101,14 @@
                     {{-- Poster Utama --}}
                     <div class="bg-[#020D1A] border border-[#4A9FD4]/30 rounded-lg p-4 flex flex-col items-center justify-center text-center relative hover:bg-[#020D1A]/80 transition cursor-pointer group min-h-[120px]">
                         @if($editEvent->poster_path)
-                            <img src="{{ asset('storage/' . $editEvent->poster_path) }}" class="absolute inset-0 w-full h-full object-cover rounded-lg">
+                            <img src="{{ $editEvent->poster_url }}" class="absolute inset-0 w-full h-full object-cover rounded-lg" onerror="this.style.display='none'; this.nextElementSibling.style.display='none'; this.nextElementSibling.nextElementSibling.style.display='flex';">
                             <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition">
                                 <i class="fa-solid fa-cloud-arrow-up text-white text-lg"></i>
                                 <span class="text-[8px] text-white mt-1">Ganti Poster</span>
+                            </div>
+                            <div style="display:none;" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-gradient-to-br from-[#0c1e35] to-[#1a3a60] rounded-lg">
+                                <i class="fa-solid fa-cloud-arrow-up text-[#C9A84C] text-lg mb-1"></i>
+                                <span class="text-[8px] uppercase tracking-wider font-semibold text-slate-300">Ganti Poster</span>
                             </div>
                         @else
                             <i class="fa-solid fa-cloud-arrow-up text-[#4A9FD4] text-xl mb-2"></i>
@@ -116,7 +120,7 @@
                     {{-- Hero Banner (Dummy Visual) --}}
                     <div class="bg-[#020D1A] border border-[#4A9FD4]/30 rounded-lg p-4 flex flex-col items-center justify-center text-center relative hover:bg-[#020D1A]/80 transition cursor-pointer group min-h-[120px]">
                         @if($editEvent->poster_path)
-                            <img src="{{ asset('storage/' . $editEvent->poster_path) }}" class="absolute inset-0 w-full h-full object-cover rounded-lg blur-xs">
+                            <img src="{{ $editEvent->poster_url }}" class="absolute inset-0 w-full h-full object-cover rounded-lg blur-xs">
                         @endif
                         <div class="absolute inset-0 bg-[#020D1A]/50 flex flex-col items-center justify-center">
                             <i class="fa-solid fa-image text-[#4A9FD4] text-xl mb-2"></i>
@@ -137,9 +141,12 @@
                 @if(count($editEvent->galleries) > 0)
                     <div class="flex flex-wrap gap-2 mt-3">
                         @foreach($editEvent->galleries as $gallery)
-                            <div class="relative group">
-                                <img src="{{ asset('storage/' . $gallery->image_path) }}" class="w-12 h-12 object-cover rounded border border-[#4A9FD4]/30">
-                                <button type="button" onclick="removeGallery({{ $gallery->id }}, this)" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition cursor-pointer">✕</button>
+                            <div class="relative group w-12 h-12 rounded border border-[#4A9FD4]/30 overflow-hidden bg-[#020D1A] flex items-center justify-center">
+                                <img src="{{ $gallery->image_url }}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div style="display:none;" class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c1e35] to-[#1a3a60]">
+                                    <i class="fa-regular fa-image text-xs text-[#C9A84C]"></i>
+                                </div>
+                                <button type="button" onclick="removeGallery({{ $gallery->id }}, this)" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition cursor-pointer z-10">✕</button>
                             </div>
                         @endforeach
                     </div>

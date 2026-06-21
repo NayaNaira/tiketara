@@ -3,161 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selamat Datang - Register</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+    <title>Tiketara - Daftar</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logotiket.png') }}">
+    @vite(['resources/css/app.css'])
 </head>
-<body class="bg-[#020b18] min-h-screen text-white relative flex flex-col justify-between p-6 sm:p-10">
+<body class="bg-[#020D1A] min-h-screen flex flex-col justify-between text-white relative select-none">
 
-    <header class="px-4 sm:px-8 py-6">
-        <img
-            src="{{ asset('images/logotiket.png') }}"
-            alt="Tiketara"
-            class="h-10">
+    <!-- Header -->
+    <header class="w-full flex items-center justify-between px-4 md:px-8 py-3 md:py-4 border-b border-[#202020]">
+        <div class="flex items-center gap-2">
+            <a href="{{ url('/') }}" class="flex items-center gap-2.5 group">
+                <img src="{{ asset('images/logotiket.png') }}" alt="Tiketara Logo" class="h-8 md:h-10 w-auto object-contain hover:opacity-90 transition">
+                <span class="text-lg md:text-xl font-bold tracking-wider text-white group-hover:text-[#C9A84C] transition">Tiketara</span>
+            </a>
+        </div>
     </header>
 
-    <div class="w-full max-w-md mx-auto my-auto flex flex-col justify-center">
-        
-        <div class="text-center md:text-left mb-6">
-            <h1 class="text-[#cca43b] text-2xl sm:text-3xl font-bold tracking-wide mb-2">
-                Selamat datang
-            </h1>
-            <p class="text-[#41628d] text-sm leading-relaxed">
-                Buat akun kamu dengan memasukan nama, email dan password
-            </p>
-        </div>
+    <main class="flex-grow flex items-center justify-center w-full max-w-4xl mx-auto z-10 my-12">
+        <div class="w-full max-w-md bg-[#041830]/60 p-8 md:p-10 rounded-2xl border border-white/[0.03] shadow-2xl backdrop-blur-sm">
 
-        <form action="{{ route('register') }}" method="POST" class="space-y-4">
-            @csrf
+            <h2 class="text-3xl font-semibold text-[#C9A84C] tracking-wide mb-2">
+                Selamat Datang!
+            </h2>
+
+            <p class="text-[#4A9FD4] text-sm font-light mb-6 leading-relaxed">
+                Buat akun kamu dengan memasukan nama, email dan password.
+            </p>
 
             @if(session('success'))
-                <div class="mb-4 p-3 rounded-lg bg-green-500 text-white text-sm">
+                <div class="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-sm rounded-xl">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Nama</label>
-                <input 
-                    type="text" 
-                    name="name" 
-                    value="{{ old('name') }}"
-                    placeholder="Masukan nama" 
-                    required 
-                    class="w-full bg-white text-gray-900 px-4 py-3 rounded-xl border border-transparent focus:outline-none focus:ring-2 focus:ring-[#cca43b] placeholder-gray-400 font-medium text-sm transition"
-                >
-                @error('name')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+            <form action="{{ route('register') }}" method="POST" class="space-y-5">
+                @csrf
 
-            <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Email</label>
-                <input 
-                    type="email" 
-                    name="email" 
-                    value="{{ old('email') }}"
-                    placeholder="Masukan email" 
-                    required 
-                    class="w-full bg-white text-gray-900 px-4 py-3 rounded-xl border border-transparent focus:outline-none focus:ring-2 focus:ring-[#cca43b] placeholder-gray-400 font-medium text-sm transition"
-                >
-                @error('email')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
-            </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 tracking-wide">
+                        Nama Lengkap
+                    </label>
+                    <div class="relative flex items-center">
+                        <input
+                            type="text"
+                            name="name"
+                            value="{{ old('name') }}"
+                            placeholder="Masukan nama lengkap"
+                            class="w-full bg-[#E2E8F0] text-[#020D1A] font-medium py-3 px-4 rounded-xl placeholder-gray-400 text-sm md:text-base outline-none focus:outline-none"
+                            required>
+                    </div>
+                    @error('name')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Password</label>
-                <div class="relative">
-                    <input 
-                        type="password" 
-                        name="password" 
-                        id="password"
-                        placeholder="Masukan Password" 
-                        required 
-                        class="w-full bg-white text-gray-900 pl-4 pr-12 py-3 rounded-xl border border-transparent focus:outline-none focus:ring-2 focus:ring-[#cca43b] placeholder-gray-400 font-medium text-sm transition"
-                    >
-                    <button type="button" onclick="togglePassword('password', 'eyeIcon')" class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition">
-                        <i id="eyeIcon" class="fa-regular fa-eye text-base"></i>
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 tracking-wide">
+                        Email
+                    </label>
+                    <div class="relative flex items-center">
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            placeholder="@email.com"
+                            class="w-full bg-[#E2E8F0] text-[#020D1A] font-medium py-3 px-4 rounded-xl placeholder-gray-400 text-sm md:text-base outline-none focus:outline-none"
+                            required>
+                    </div>
+                    @error('email')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 tracking-wide">
+                        Password
+                    </label>
+                    <div class="relative flex items-center">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Masukan password baru"
+                            class="w-full bg-[#E2E8F0] text-[#020D1A] font-medium py-3 pl-4 pr-12 rounded-xl placeholder-gray-400 text-sm md:text-base outline-none focus:outline-none"
+                            required>
+
+                        <button
+                            type="button"
+                            onclick="togglePassword('password', 'eyeIconVisible', 'eyeIconHidden')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition duration-150 active:scale-95">
+                            
+                            <svg id="eyeIconVisible" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+
+                            <svg id="eyeIconHidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
+                    @error('password')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300 tracking-wide">
+                        Konfirmasi Password
+                    </label>
+                    <div class="relative flex items-center">
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="password_confirmation"
+                            placeholder="Masukan ulang password"
+                            class="w-full bg-[#E2E8F0] text-[#020D1A] font-medium py-3 pl-4 pr-12 rounded-xl placeholder-gray-400 text-sm md:text-base outline-none focus:outline-none"
+                            required>
+
+                        <button
+                            type="button"
+                            onclick="togglePassword('confirm_password', 'confirmEyeIconVisible', 'confirmEyeIconHidden')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition duration-150 active:scale-95">
+                            
+                            <svg id="confirmEyeIconVisible" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+
+                            <svg id="confirmEyeIconHidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-4 pt-2">
+                    <button
+                        type="submit"
+                        class="w-full bg-[#C9A84C] hover:opacity-90 transition text-black font-semibold py-3 rounded-md">
+                        Buat akun →
                     </button>
+
+                    <a 
+                        href="{{ route('auth.google.redirect') }}"
+                        class="w-full border border-[#C9A84C] hover:bg-white/5 text-white font-medium py-3 rounded-md flex items-center justify-center gap-3 transition">
+                        
+                        <img
+                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                            alt="Google"
+                            class="w-5 h-5">
+
+                        <span>Daftar dengan Google</span>
+                    </a>
                 </div>
-                @error('password')
-                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                @enderror
+            </form>
+
+            <div class="border-t border-[#4A9FD4]/40 mt-8 pt-5">
+                <p class="text-center text-sm">
+                    <span class="text-[#4A9FD4]">
+                        Sudah punya akun?
+                    </span>
+                    <a
+                        href="{{ route('login') }}"
+                        class="text-[#C9A84C] hover:underline font-medium">
+                        Masuk
+                    </a>
+                </p>
             </div>
-
-            <div class="flex flex-col space-y-1.5">
-                <label class="text-[#41628d] text-xs font-semibold tracking-wide">Konfirmasi Password</label>
-                <div class="relative">
-                    <input 
-                        type="password" 
-                        name="password_confirmation" 
-                        id="confirm_password"
-                        placeholder="Masukan ulang Password" 
-                        required 
-                        class="w-full bg-white text-gray-900 pl-4 pr-12 py-3 rounded-xl border border-transparent focus:outline-none focus:ring-2 focus:ring-[#cca43b] placeholder-gray-400 font-medium text-sm transition"
-                    >
-                    <button type="button" onclick="togglePassword('confirm_password', 'eyeIconConfirm')" class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition">
-                        <i id="eyeIconConfirm" class="fa-regular fa-eye text-base"></i>
-                    </button>
-                </div>
-            </div>
-
-            @if ($errors->any())
-                <div class="text-red-400 text-xs py-1">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-
-            <div class="pt-2">
-                <button 
-                    type="submit" 
-                    class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-[#020b18] font-bold py-3 rounded-xl transition shadow-md active:scale-[0.99]"
-                >
-                    Buat akun
-                </button>
-            </div>
-        </form>
-
-        <div class="text-center my-5">
-            <span class="text-xs text-gray-400 tracking-wide">Atau buat akun dengan</span>
         </div>
+    </main>
 
-        <a 
-            href="#" 
-            class="w-full border border-[#cca43b] hover:bg-white/5 text-white font-medium py-3 rounded-xl flex items-center justify-center space-x-2 transition text-sm active:scale-[0.99]"
-        >
-            <i class="fa-brands fa-google text-red-500"></i>
-            <span>Google</span>
-        </a>
-
-        <div class="text-center mt-6 text-sm">
-            <span class="text-gray-400">Sudah punya akun? </span>
-            <a href="{{ route('login') }}" class="text-[#cca43b] hover:underline font-semibold ml-1">Masuk</a>
+    <footer class="text-center pb-6 mt-8">
+        <p class="text-gray-300 text-xs">
+            ©2026 Tiketara. All rights reserved.
+        </p>
+        <div class="flex justify-center gap-6 mt-4 text-xs">
+            <a href="{{ route('privacy.policy') }}" class="text-gray-300 hover:text-[#C9A84C]">Privacy Policy</a>
+            <a href="{{ route('terms.service') }}" class="text-gray-300 hover:text-[#C9A84C]">Terms of Service</a>
+            <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Support</a>
         </div>
-
-    </div>
-
-    <div class="h-4 md:hidden"></div>
+    </footer>
 
     <script>
-        function togglePassword(inputId, iconId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+        function togglePassword(inputId, visibleIconId, hiddenIconId) {
+            const passwordInput = document.getElementById(inputId);
+            const iconVisible = document.getElementById(visibleIconId);
+            const iconHidden = document.getElementById(hiddenIconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                iconVisible.classList.add('hidden');
+                iconHidden.classList.remove('hidden');
             } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                passwordInput.type = 'password';
+                iconVisible.classList.remove('hidden');
+                iconHidden.classList.add('hidden');
             }
         }
     </script>

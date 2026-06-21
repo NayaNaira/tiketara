@@ -36,15 +36,14 @@
             <div class="bg-[#041830] rounded-xl border border-[#4A9FD4]/30 p-5 flex flex-col md:flex-row gap-5 items-stretch transition hover:border-[#C9A84C]/50 shadow-md">
                 
                 {{-- Event Poster --}}
-                <div class="w-full md:w-36 shrink-0 h-48 md:h-auto rounded-lg overflow-hidden border border-[#4A9FD4]/20 relative bg-[#020D1A] flex items-center justify-center">
+                <div class="w-full md:w-36 shrink-0 h-48 md:h-auto rounded-lg overflow-hidden border border-[#4A9FD4]/20 relative bg-[#020D1A] flex items-center justify-center min-h-[120px]">
                     @if($event->poster_path)
-                        <img src="{{ asset('storage/' . $event->poster_path) }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
-                    @else
-                        <div class="flex flex-col items-center justify-center text-gray-500">
-                            <i class="fa-regular fa-image text-3xl mb-1"></i>
-                            <span class="text-[10px]">No Poster</span>
-                        </div>
+                        <img src="{{ $event->poster_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
                     @endif
+                    <div class="@if($event->poster_path) hidden @endif absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gradient-to-br from-[#0c1e35] to-[#1a3a60] p-2 text-center">
+                        <i class="fa-regular fa-image text-2xl mb-1 text-[#C9A84C]"></i>
+                        <span class="text-[9px] uppercase tracking-wider font-semibold text-slate-300">No Poster</span>
+                    </div>
                 </div>
 
                 {{-- Event Details --}}

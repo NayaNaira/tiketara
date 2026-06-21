@@ -13,7 +13,32 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        return view('profile.profile', compact('user'));
+        $orders = [];
+        $promoterEvents = [];
+        $pendingEvents = [];
+        $pendingPromoters = [];
+
+        if ($user->role === 'buyer') {
+            $orders = \App\Models\Order::with(['event', 'ticketType'])
+                ->where('user_id', $user->id)
+                ->latest()
+                ->get();
+        } elseif ($user->role === 'promoter') {
+            $promoterEvents = \App\Models\Event::where('promoter_id', $user->id)
+                ->latest()
+                ->get();
+        } elseif ($user->role === 'super_admin') {
+            $pendingEvents = \App\Models\Event::with('promoter')
+                ->where('status', 'pending')
+                ->latest()
+                ->get();
+
+            $pendingPromoters = \App\Models\User::where('promoter_status', 'pending')
+                ->latest()
+                ->get();
+        }
+
+        return view('profile.profile', compact('user', 'orders', 'promoterEvents', 'pendingEvents', 'pendingPromoters'));
     }
 
     // Tampilkan halaman edit profile

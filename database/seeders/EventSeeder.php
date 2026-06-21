@@ -27,7 +27,7 @@ class EventSeeder extends Seeder
                     'start_time' => '19:00:00',
                     'end_time' => '22:00:00',
                     'max_ticket_per_order' => 4,
-                    'poster_path' => 'events/indie-night.jpg',
+                    'poster_path' => 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=600',
                     'status' => 'approved',
                     'rejection_reason' => null,
                     'terms_and_conditions' => "1. Tiket yang sudah dibeli bersifat final dan tidak dapat dibatalkan, di-refund, atau diuangkan kembali.\n2. Pembeli wajib menunjukkan E-Ticket resmi beserta kartu identitas (KTP/SIM/Paspor) yang sah pada saat registrasi masuk.\n3. Satu E-Ticket hanya berlaku untuk 1 (satu) orang pengunjung.\n4. Harga tiket sudah termasuk 1 (satu) minuman gratis yang dapat ditukarkan di area bar kafe.\n5. Pengunjung dilarang membawa makanan dan minuman dari luar area The Backyard Creative Space.\n6. Dilarang keras membawa senjata tajam, senjata api, obat-obatan terlarang, serta minuman beralkohol.\n7. Penyelenggara berhak mengeluarkan pengunjung yang membuat kegaduhan atau tidak mematuhi protokol ketertiban demi kenyamanan bersama.",
@@ -37,7 +37,7 @@ class EventSeeder extends Seeder
                     ['name' => 'Regular Pass', 'price' => 50000, 'quota' => 70],
                 ],
                 'galleries' => [
-                    'galleries/indie-1.jpg', 'galleries/indie-2.jpg'
+                    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=400', 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=400'
                 ]
             ],
             [
@@ -54,7 +54,7 @@ class EventSeeder extends Seeder
                     'start_time' => '10:00:00',
                     'end_time' => '13:00:00',
                     'max_ticket_per_order' => 5,
-                    'poster_path' => 'events/tech-coffee.jpg',
+                    'poster_path' => 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=600',
                     'status' => 'approved',
                     'rejection_reason' => null,
                     'terms_and_conditions' => "1. Registrasi ulang dibuka 45 menit sebelum acara dimulai. Pengunjung disarankan datang tepat waktu untuk menghindari antrean.\n2. E-Ticket akan di-scan di pintu masuk. Harap siapkan barcode dengan kecerahan layar handphone yang cukup.\n3. Fasilitas yang didapatkan meliputi akses workshop, free-flow coffee/tea, kudapan ringan, serta E-Certificate resmi yang dikirimkan maksimal H+3 acara melalui email terdaftar.\n4. Pengunjung diwajibkan membawa laptop atau perangkat pendukung sendiri jika ingin mengikuti sesi praktik secara langsung.\n5. Dilarang melakukan perekaman video secara utuh selama pemaparan materi tanpa izin tertulis dari panitia.\n6. Panitia tidak bertanggung jawab atas kehilangan barang pribadi milik pengunjung selama acara berlangsung.",
@@ -63,7 +63,7 @@ class EventSeeder extends Seeder
                     ['name' => 'Seat Pass', 'price' => 45000, 'quota' => 50],
                 ],
                 'galleries' => [
-                    'galleries/tech-1.jpg', 'galleries/tech-2.jpg'
+                    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400', 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=400'
                 ]
             ],
             [
@@ -80,7 +80,7 @@ class EventSeeder extends Seeder
                     'start_time' => '09:00:00',
                     'end_time' => '17:00:00',
                     'max_ticket_per_order' => 2,
-                    'poster_path' => 'events/basketball-league.jpg',
+                    'poster_path' => 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600',
                     'status' => 'approved',
                     'rejection_reason' => null,
                     'terms_and_conditions' => "1. Tiket penonton berlaku untuk akses satu hari penuh ke area tribun GOR Pemuda Indoor Court.\n2. Pengunjung wajib menjaga kebersihan dan dilarang membuang sampah sembarangan di area tribun maupun lapangan.\n3. Penonton dilarang memasuki area *court* (lapangan pertandingan) kecuali atas instruksi dari panitia atau wasit.\n4. Dilarang membawa atribut politik, spanduk yang bersifat provokatif, rasis, atau mengandung unsur SARA.\n5. Semua pengunjung wajib menggunakan sepatu olahraga atau alas kaki yang tidak merusak lantai lapangan indoor.\n6. Apabila terjadi keributan atau tindakan anarkis, pihak keamanan berhak mengusir pelaku dari area GOR tanpa ada pengembalian uang tiket.\n7. Keputusan panitia dan wasit pertandingan bersifat mutlak dan tidak dapat diganggu gugat.",
@@ -89,7 +89,7 @@ class EventSeeder extends Seeder
                     ['name' => 'General Admission', 'price' => 20000, 'quota' => 150],
                 ],
                 'galleries' => [
-                    'galleries/basket-1.jpg', 'galleries/basket-2.jpg'
+                    'https://images.unsplash.com/photo-1519766304817-4f37bda74a27?q=80&w=400', 'https://images.unsplash.com/photo-1505666287802-931dc83948e9?q=80&w=400'
                 ]
             ],
             [
@@ -106,7 +106,7 @@ class EventSeeder extends Seeder
                     'start_time' => '19:00:00',
                     'end_time' => '21:30:00',
                     'max_ticket_per_order' => 4,
-                    'poster_path' => 'events/art-verse.jpg',
+                    'poster_path' => 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?q=80&w=600',
                     'status' => 'approved',
                     'rejection_reason' => null,
                     'terms_and_conditions' => "1. Pengunjung wajib menjaga ketenangan dan suasana kondusif selama acara pembacaan puisi dan teater berlangsung.\n2. Dilarang menyentuh, merusak, atau mengotori instalasi karya seni yang dipajang di dalam Kala Kini Art Gallery.\n3. Diperbolehkan mengambil foto menggunakan kamera handphone tanpa menyalakan fitur lampu kilat (*flash photography*).\n4. Penggunaan kamera profesional (DSLR/Mirrorless) untuk keperluan komersial wajib melaporkan diri ke meja registrasi terlebih dahulu.\n5. Gerbang masuk galeri akan ditutup 15 menit setelah pertunjukan utama dimulai demi menjaga kekhusyukan acara.\n6. Pengunjung yang terlambat baru diperbolehkan masuk pada saat sesi jeda atau *break*.",
@@ -115,7 +115,7 @@ class EventSeeder extends Seeder
                     ['name' => 'Art Pass', 'price' => 30000, 'quota' => 80],
                 ],
                 'galleries' => [
-                    'galleries/art-1.jpg'
+                    'https://images.unsplash.com/photo-1492037766660-2a56f9eb3fcb?q=80&w=400'
                 ]
             ],
             [
@@ -132,7 +132,7 @@ class EventSeeder extends Seeder
                     'start_time' => '10:00:00',
                     'end_time' => '21:00:00',
                     'max_ticket_per_order' => 5,
-                    'poster_path' => 'events/urban-market.jpg',
+                    'poster_path' => 'https://images.unsplash.com/photo-1488459718432-010c58a257e5?q=80&w=600',
                     'status' => 'approved',
                     'rejection_reason' => null,
                     'terms_and_conditions' => "1. Tiket fisik atau E-Ticket harian wajib disimpan selama berada di dalam area festival.\n2. Tiket masuk yang valid dapat ditukarkan dengan voucher potongan belanja senilai Rp5.000 di tenant thrift atau F&B tertentu dengan syarat minimum belanja.\n3. Pengunjung bertanggung jawab penuh atas barang belanjaan dan barang bawaan pribadi masing-masing.\n4. Transaksi di dalam area market disarankan menggunakan pembayaran non-tunai (QRIS/E-Wallet), namun tetap sediakan uang tunai secukupnya.\n5. Pembeli diharapkan membawa kantong belanja ramah lingkungan sendiri (*tote bag*) guna mengurangi sampah plastik.\n6. Area ini ramah hewan peliharaan (*pet-friendly*), dengan syarat hewan peliharaan menggunakan tali pengikat (*leash*) dan kebersihannya dijaga oleh pemilik.",
@@ -141,7 +141,7 @@ class EventSeeder extends Seeder
                     ['name' => 'Daily Pass Ticket', 'price' => 15000, 'quota' => 300],
                 ],
                 'galleries' => [
-                    'galleries/market-1.jpg', 'galleries/market-2.jpg'
+                    'https://images.unsplash.com/photo-1533900298318-6b8da08a523e?q=80&w=400', 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?q=80&w=400'
                 ]
             ],
             [
@@ -158,7 +158,7 @@ class EventSeeder extends Seeder
                     'start_time' => '06:30:00',
                     'end_time' => '10:00:00',
                     'max_ticket_per_order' => 3,
-                    'poster_path' => 'events/photowalk.jpg',
+                    'poster_path' => 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=600',
                     'status' => 'approved',
                     'rejection_reason' => null,
                     'terms_and_conditions' => "1. Tiket pendaftaran sudah termasuk atribut photowalk (peta rute, stiker komunitas) dan air mineral botol.\n2. Pengunjung bebas menggunakan jenis kamera apapun, mulai dari kamera HP, Analog, Mirrorless, hingga DSLR.\n3. Rute jalan kaki akan melewati area publik dan jalan raya umum. Seluruh peserta wajib mengutamakan keselamatan dan mematuhi rambu lalu lintas.\n4. Dilarang memotret objek atau area militer/privat yang memiliki tanda larangan memotret.\n5. Selama photowalk berlangsung, peserta dilarang merusak fasilitas cagar budaya atau mengganggu kenyamanan pejalan kaki lainnya.\n6. Acara akan tetap berlangsung jika hujan ringan (gerimis). Peserta disarankan membawa pelindung kamera tambahan (*rain cover*) dan payung/jas hujan pribadi.",
@@ -167,7 +167,7 @@ class EventSeeder extends Seeder
                     ['name' => 'Registration Fee', 'price' => 25000, 'quota' => 60],
                 ],
                 'galleries' => [
-                    'galleries/photo-1.jpg'
+                    'https://images.unsplash.com/photo-1452784444945-3f422708fe5e?q=80&w=400'
                 ]
             ],
         ];

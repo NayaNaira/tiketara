@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tiketara - Masuk</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logotiket.png') }}">
     @vite(['resources/css/app.css'])
 </head>
-<body class="bg-[#020D1A] min-h-screen flex flex-col justify-between text-white p-6 relative select-none">
+<body class="bg-[#020D1A] min-h-screen flex flex-col justify-between text-white relative select-none">
 
-    <header class="px-4 sm:px-8 py-4">
-        <img
-            src="{{ asset('images/logotiket.png') }}"
-            alt="Tiketara"
-            class="h-14 w-auto">
+    <!-- Header -->
+    <header class="w-full flex items-center justify-between px-4 md:px-8 py-3 md:py-4 border-b border-[#202020]">
+        <div class="flex items-center gap-2">
+            <a href="{{ url('/') }}" class="flex items-center gap-2.5 group">
+                <img src="{{ asset('images/logotiket.png') }}" alt="Tiketara Logo" class="h-8 md:h-10 w-auto object-contain hover:opacity-90 transition">
+                <span class="text-lg md:text-xl font-bold tracking-wider text-white group-hover:text-[#C9A84C] transition">Tiketara</span>
+            </a>
+        </div>
     </header>
 
     <main class="flex-grow flex items-center justify-center w-full max-w-4xl mx-auto z-10 my-12">
@@ -136,13 +140,13 @@
         </div>
     </main>
 
-    <footer class="text-center mt-8">
+    <footer class="text-center pb-6 mt-8">
         <p class="text-gray-300 text-xs">
-            ©2026 TicketFlow Management Systems. All rights reserved.
+            ©2026 Tiketara. All rights reserved.
         </p>
         <div class="flex justify-center gap-6 mt-4 text-xs">
-            <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Privacy Policy</a>
-            <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Terms of Service</a>
+            <a href="{{ route('privacy.policy') }}" class="text-gray-300 hover:text-[#C9A84C]">Privacy Policy</a>
+            <a href="{{ route('terms.service') }}" class="text-gray-300 hover:text-[#C9A84C]">Terms of Service</a>
             <a href="#" class="text-gray-300 hover:text-[#C9A84C]">Support</a>
         </div>
     </footer>

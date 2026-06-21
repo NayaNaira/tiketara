@@ -60,4 +60,15 @@ class Event extends Model
     {
         return $this->hasMany(Order::class, 'events_id');
     }
+
+    public function getPosterUrlAttribute()
+    {
+        if (empty($this->poster_path)) {
+            return null;
+        }
+        if (str_starts_with($this->poster_path, 'http') || str_starts_with($this->poster_path, 'https')) {
+            return $this->poster_path;
+        }
+        return asset('storage/' . $this->poster_path);
+    }
 }

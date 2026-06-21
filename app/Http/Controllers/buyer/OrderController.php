@@ -83,11 +83,11 @@ class OrderController extends Controller
     public function reviewOrder($eventId)
     {
         // 1. Ambil data pilihan tiket dari session (pastikan masih ada)
-        if (!session()->has('booking_ticket_types_id') || !session()->has('booking_quantity')) {
+        if (!session()->has('booking_ticket_type_id') || !session()->has('booking_quantity')) {
             return redirect()->route('buyer.ticket.select', $eventId)->with('error', 'Sesi habis, silakan pilih kategori tiket kembali.');
         }
 
-        $ticketTypeId = session('booking_ticket_types_id');
+        $ticketTypeId = session('booking_ticket_type_id');
         $quantity = session('booking_quantity');
 
         // 2. Tarik data asli dari database
@@ -152,7 +152,7 @@ class OrderController extends Controller
                     'user_id'           => Auth::id(),
                     'events_id'         => $eventId,
                     'ticket_type_id'    => $ticketTypeId,
-                    'payment_method_id' => $ticketTypeId, 
+                    'payment_method_id' => \App\Models\PaymentMethod::where('is_active', true)->first()->id ?? 1, 
                     'quantity'          => $quantity,
                     'total_amount'      => $total,
                     'status'            => 'pending',
@@ -183,8 +183,16 @@ class OrderController extends Controller
         $order = Order::with(['event', 'ticketType', 'user'])->findOrFail($id);
         $fallbackRoute = Route::has('buyer.home') ? 'buyer.home' : 'buyer.event.index';
 
-        if ($order->status === 'success') {
+        if ($order->status === 'paid') {
             return redirect()->route($fallbackRoute)->with('success', 'Pembayaran berhasil, tiket Anda sudah lunas!');
+        }
+
+        // Jika server key tidak diset di .env, aktifkan mode simulasi lokal agar transaksi tidak crash
+        $serverKey = env('MIDTRANS_SERVER_KEY');
+        if (empty($serverKey)) {
+            $isMock = true;
+            $snapToken = 'mock_snap_token_' . Str::random(10);
+            return view('user.payment.payment', compact('order', 'snapToken', 'isMock'));
         }
 
         $this->initMidtrans();
@@ -202,10 +210,22 @@ class OrderController extends Controller
 
         try {
             $snapToken = Snap::getSnapToken($params);
-            return view('user.payment.payment', compact('order', 'snapToken'));
+            $isMock = false;
+            return view('user.payment.payment', compact('order', 'snapToken', 'isMock'));
         } catch (\Exception $e) {
             return redirect()->route($fallbackRoute)->with('error', 'Gagal memuat sistem pembayaran: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * SIMULASI SUKSES LOKAL (Digunakan jika API Key Midtrans di .env kosong)
+     */
+    public function simulateSuccess($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->update(['status' => 'paid']);
+
+        return redirect()->route('buyer.order.ticket', $order->id)->with('success', 'Simulasi Pembayaran Berhasil! E-Tiket Anda telah terbit.');
     }
 
     public function paymentNotification(Request $request)
@@ -220,7 +240,7 @@ class OrderController extends Controller
             $order = Order::findOrFail($orderId);
 
             if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
-                $order->update(['status' => 'success']);
+                $order->update(['status' => 'paid']);
             } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
                 $order->update(['status' => 'failed']);
                 $order->ticketType()->decrement('sold', $order->quantity);
@@ -240,10 +260,33 @@ class OrderController extends Controller
 
         $fallbackRoute = Route::has('buyer.home') ? 'buyer.home' : 'buyer.event.index';
 
-        if ($order->status !== 'success') {
+        if ($order->status !== 'paid') {
             return redirect()->route($fallbackRoute)->with('error', 'Tiket belum lunas atau transaksi gagal.');
         }
 
         return view('user.order.ticket', compact('order'));
+    }
+
+    public function viewOfflineTicket($id)
+    {
+        $order = Order::with(['event', 'ticketType', 'user'])
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        $fallbackRoute = Route::has('buyer.home') ? 'buyer.home' : 'buyer.event.index';
+
+        if ($order->status !== 'paid') {
+            return redirect()->route($fallbackRoute)->with('error', 'Tiket belum lunas atau transaksi gagal.');
+        }
+
+        return view('user.order.ticket-offline', compact('order'));
+    }
+
+    public function checkStatus($id)
+    {
+        $order = Order::findOrFail($id);
+        return response()->json([
+            'status' => $order->status
+        ]);
     }
 }

@@ -35,7 +35,21 @@ Route::get('/', function () {
     return view('welcome', compact('events'));
 });
 
+// Privacy Policy & Terms of Service
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy.policy');
+
+Route::get('/terms-of-service', function () {
+    return view('terms-of-service');
+})->name('terms.service');
+
+Route::get('/ticket-selling-guide', function () {
+    return view('ticket-selling-guide');
+})->name('ticket.guide');
+
 // Detail Event
+Route::get('/events', [BuyerEventController::class, 'search'])->name('events.search');
 Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
 
 // Midtrans Payment Webhook (Notifikasi Otomatis dari Server Midtrans)
@@ -193,11 +207,13 @@ Route::middleware(['auth'])->group(function () {
         // STEP 4: Proses Generate Token Midtrans & Save DB tabel Orders
         Route::post('/order/store/{eventId}', [OrderController::class, 'store'])->name('order.store');
 
-        // STEP 5: Tampilan Halaman Bayar Pop-Up QRIS
+        // STEP 5: Tampilan Halaman Bayar Pop-Up QRIS & Simulasi
         Route::get('/order/payment/{id}', [OrderController::class, 'paymentPage'])->name('order.payment');
+        Route::get('/order/payment/{id}/simulate-success', [OrderController::class, 'simulateSuccess'])->name('order.payment.simulate');
 
         // STEP 6: Tampilan Cetak E-Tiket
         Route::get('/order/{id}/ticket', [OrderController::class, 'viewTicket'])->name('order.ticket');
+        Route::get('/order/{id}/ticket/offline', [OrderController::class, 'viewOfflineTicket'])->name('order.ticket.offline');
 
         // BONUS: Cek Status Transaksi Manual (Debugging)
         Route::get('/order/{id}/check-status', [OrderController::class, 'checkStatus'])->name('order.checkStatus');

@@ -41,8 +41,11 @@
             <h2 class="text-center text-xs font-bold tracking-widest text-[#cca43b] uppercase">Detail Transaksi</h2>
             
             <div class="flex items-center space-x-4 pb-4 border-b border-gray-900">
-                <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-900 shrink-0">
-                    <img src="{{ $event->image_path ? asset('storage/' . $event->image_path) : 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=150' }}" alt="Event Cover" class="w-full h-full object-cover">
+                <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-900 shrink-0 relative flex items-center justify-center border border-gray-800">
+                    <img src="{{ $event->poster_url ?? 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=150' }}" alt="Event Cover" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                    <div class="hidden absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#0c1e35] to-[#1a3a60]">
+                        <i class="fa-regular fa-image text-xs text-[#cca43b]/70"></i>
+                    </div>
                 </div>
                 <div>
                     <h3 class="text-sm font-bold text-white tracking-wide uppercase">{{ $event->title }}</h3>

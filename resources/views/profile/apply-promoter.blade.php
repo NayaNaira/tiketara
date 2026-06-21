@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengajuan Promoter - Tiketara</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logotiket.png') }}">
 
     @vite(['resources/css/app.css'])
 
@@ -20,10 +21,12 @@
 <body class="bg-[#020D1A] min-h-screen">
 
     <header class="px-4 sm:px-8 py-6">
-        <img
-            src="{{ asset('images/logo.png') }}"
-            alt="Tiketara"
-            class="h-10">
+        <a href="{{ url('/') }}" class="inline-block hover:opacity-90 transition">
+            <img
+                src="{{ asset('images/logotiket.png') }}"
+                alt="Tiketara"
+                class="h-10">
+        </a>
     </header>
 
     <main class="flex justify-center px-4 pb-10">
@@ -45,9 +48,9 @@
                     <div class="relative">
                         @if($user->avatar)
                             @if(str_starts_with($user->avatar, 'http'))
-                                <img id="avatarPreview" src="{{ $user->avatar }}" alt="Avatar" class="w-32 h-32 rounded-2xl object-cover border-4 border-[#C9A84C] shadow-lg" referrerpolicy="no-referrer">
+                                <img id="avatarPreview" src="{{ $user->avatar }}" alt="Avatar" class="w-32 h-32 rounded-2xl object-cover border-4 border-[#C9A84C] shadow-lg" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=111827&color=C9A84C&size=128';">
                             @else
-                                <img id="avatarPreview" src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" class="w-32 h-32 rounded-2xl object-cover border-4 border-[#C9A84C] shadow-lg">
+                                <img id="avatarPreview" src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" class="w-32 h-32 rounded-2xl object-cover border-4 border-[#C9A84C] shadow-lg" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=111827&color=C9A84C&size=128';">
                             @endif
                         @else
                             <img id="avatarPreview" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=111827&color=C9A84C&size=128" alt="Avatar" class="w-32 h-32 rounded-2xl object-cover border-4 border-[#C9A84C] shadow-lg">

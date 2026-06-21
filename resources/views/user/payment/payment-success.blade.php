@@ -17,10 +17,12 @@
 <body class="bg-[#020D1A] min-h-screen flex flex-col" style="font-family: 'DM Sans', sans-serif;">
     <!-- Header -->
     <header class="px-4 sm:px-8 py-6">
-        <img
-            src="{{ asset('images/logotiket.png') }}"
-            alt="Tiketara"
-            class="h-10">
+        <a href="{{ url('/') }}" class="inline-block hover:opacity-90 transition">
+            <img
+                src="{{ asset('images/logotiket.png') }}"
+                alt="Tiketara"
+                class="h-10">
+        </a>
     </header>
 
     <!-- Content -->

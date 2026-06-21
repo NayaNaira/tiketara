@@ -26,10 +26,12 @@
 <body class="bg-[#020D1A] min-h-screen flex flex-col">
 
     <header class="px-4 sm:px-8 py-6">
-        <img
-            src="{{ asset('images/logo.png') }}"
-            alt="Tiketara"
-            class="h-10">
+        <a href="{{ url('/') }}" class="inline-block hover:opacity-90 transition">
+            <img
+                src="{{ asset('images/logotiket.png') }}"
+                alt="Tiketara"
+                class="h-10">
+        </a>
     </header>
 
     <div class="flex-grow flex items-center justify-center w-full max-w-md mx-auto fade-in">
@@ -62,7 +64,7 @@
     </div>
 
     <div class="w-full text-center text-[11px] md:text-xs text-slate-400 font-light space-y-3 pt-6">
-        <p class="opacity-75">&copy; 2026 TicketFlow Management Systems. All rights reserved.</p>
+        <p class="opacity-75">&copy; 2026 Tiketara. All rights reserved.</p>
         <div class="flex justify-center space-x-5 opacity-90">
             <a href="#" class="hover:text-[#4A9FD4] transition duration-150">Privacy Policy</a>
             <a href="#" class="hover:text-[#4A9FD4] transition duration-150">Terms of Service</a>

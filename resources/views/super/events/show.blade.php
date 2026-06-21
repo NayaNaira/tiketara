@@ -134,12 +134,14 @@
             </div>
         </div>
         
-        <div class="w-64 h-40 rounded-xl overflow-hidden hidden lg:block shrink-0">
+        <div class="w-64 h-40 rounded-xl overflow-hidden hidden lg:block shrink-0 relative bg-[#020D1A] border border-[#4A9FD4]/20 flex items-center justify-center">
             @if($event->poster_path)
-                <img src="{{ asset('storage/' . $event->poster_path) }}" class="w-full h-full object-cover" alt="{{ $event->title }}">
-            @else
-                <div class="w-full h-full bg-[#020D1A] flex items-center justify-center text-gray-500 text-sm">No Poster Available</div>
+                <img src="{{ $event->poster_url }}" class="w-full h-full object-cover" alt="{{ $event->title }}" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
             @endif
+            <div class="@if($event->poster_path) hidden @endif absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gradient-to-br from-[#0c1e35] to-[#1a3a60] p-2 text-center">
+                <i class="fa-regular fa-image text-2xl mb-1 text-[#C9A84C]"></i>
+                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-300">No Poster</span>
+            </div>
         </div>
     </div>
 

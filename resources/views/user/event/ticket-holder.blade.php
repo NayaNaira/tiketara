@@ -59,6 +59,16 @@
             <div class="w-full p-6 border border-[#1e3a5f] rounded-2xl bg-[#020b18]/50 space-y-5">
                 <h2 class="text-center text-xxs font-bold tracking-widest text-[#cca43b] uppercase mb-2">Informasi Pemegang Tiket</h2>
                 
+                @if ($errors->any())
+                    <div class="w-full p-4 rounded-xl bg-red-950/55 border border-red-500/35 text-red-200 text-xs">
+                        <ul class="list-disc list-inside space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                
                 <div class="flex flex-col space-y-1.5">
                     <label class="text-[#41628d] text-xxs font-bold tracking-wider uppercase">Nama Lengkap</label>
                     <input type="text" name="full_name" value="{{ old('full_name', Auth::user()->name ?? '') }}" placeholder="Sesuai KTP / Identitas" required 

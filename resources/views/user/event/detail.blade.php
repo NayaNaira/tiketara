@@ -23,10 +23,18 @@
                 </a>
             </div>
 
-            <!-- Profile Avatar -->
-            <div class="w-11 h-11 rounded-full overflow-hidden border-2 border-[#C9A84C]">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Guest') }}&background=C9A84C&color=fff" class="w-full h-full object-cover">
-            </div>
+            <!-- Profile Avatar / Login Button -->
+            @auth
+                <a href="{{ url('/profile') }}" class="w-11 h-11 rounded-full overflow-hidden border-2 border-[#C9A84C] hover:border-white transition block">
+                    @if(auth()->user()->avatar)
+                        <img src="{{ auth()->user()->avatar }}" alt="Profile" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                    @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=C9A84C&color=fff" alt="Profile" class="w-full h-full object-cover">
+                    @endif
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="text-xs md:text-sm font-semibold text-white bg-[#C9A84C] hover:bg-[#b0923e] px-4 py-1.5 md:py-2 rounded-full transition">Masuk</a>
+            @endauth
         </div>
     </header>
 
@@ -85,8 +93,14 @@
                 </div>
 
                 <!-- KANAN (Poster Event) -->
-                <div class="lg:w-[40%] w-full">
-                    <img src="{{ asset('storage/' . $event->poster_path) }}" class="w-full h-[320px] object-cover rounded-2xl shadow-2xl border border-[#1e3a5f]">
+                <div class="lg:w-[40%] w-full aspect-[4/3] lg:h-[320px] rounded-2xl overflow-hidden relative shadow-2xl border border-[#1e3a5f] bg-slate-900 flex items-center justify-center">
+                    <img src="{{ $event->poster_url }}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                    <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#0c1e35] to-[#1a3a60] text-slate-400 p-4 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mb-2 text-[#C9A84C]">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z" />
+                        </svg>
+                        <span class="text-xs font-bold tracking-wider uppercase text-slate-300">TIKETARA EVENT</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,8 +123,12 @@
                 <h3 class="text-[#cca43b] text-sm font-bold tracking-wider uppercase">Gallery</h3>
                 <div class="grid grid-cols-3 sm:grid-cols-4 gap-4">
                     @foreach($event->galleries as $gallery)
-                    <div class="aspect-square rounded-lg overflow-hidden bg-gray-900 border border-gray-800">
-                        <img src="{{ asset('storage/' . $gallery->image_path) }}" class="w-full h-full object-cover hover:scale-110 transition duration-300" alt="Gallery">
+                    <div class="aspect-square rounded-lg overflow-hidden bg-gray-900 border border-gray-800 relative flex items-center justify-center">
+                        <img src="{{ $gallery->image_url }}" class="w-full h-full object-cover hover:scale-110 transition duration-300" alt="Gallery" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                        <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#041020] to-[#0c1e35] text-slate-500 text-center">
+                            <i class="fa-regular fa-image text-xl mb-1 text-[#cca43b]/70"></i>
+                            <span class="text-[9px] uppercase tracking-wider font-semibold text-slate-400">Gallery</span>
+                        </div>
                     </div>
                     @endforeach
                 </div>
@@ -181,9 +199,66 @@
 
     </main>
 
-    <footer class="w-full mt-auto py-6 border-t border-gray-950 bg-[#010710] text-center">
-        <p class="text-xxs text-[#cca43b] font-bold tracking-widest uppercase">Copyright</p>
-        <p class="text-gray-500 text-xxs tracking-wider mt-1">© 2026 {{ strtoupper($event->venue_name) }}. ALL RIGHTS RESERVED.</p>
+    <footer class="w-full bg-[#031124] border-t border-[#202020] mt-16">
+        <div class="max-w-[1500px] mx-auto px-4 md:px-8 pt-16 md:pt-20 pb-12 md:pb-16 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 text-left" style="padding-top: clamp(20px, 3vw, 36px); padding-bottom: clamp(20px, 3vw, 36px);">
+            <!-- Col 1: Logo & Deskripsi -->
+            <div class="space-y-4">
+                <a href="{{ url('/') }}" class="inline-block hover:opacity-90 transition">
+                    <img src="{{ asset('images/logotiket.png') }}" alt="Tiketara Logo" class="h-10 w-auto object-contain">
+                </a>
+                <p class="text-xs md:text-sm text-[#DADADA] leading-relaxed opacity-85 font-light">
+                    Tiketara adalah platform pemesanan tiket konser, festival, olahraga, dan seminar terpercaya di Indonesia. Dapatkan akses mudah menuju event kreatif dan seru di kota Anda.
+                </p>
+            </div>
+            
+            <!-- Col 2: Jelajahi -->
+            <div class="space-y-4">
+                <h4 class="text-sm font-bold text-[#C9A84C] uppercase tracking-wider font-semibold">JELAJAHI</h4>
+                <ul class="space-y-2 text-xs md:text-sm text-[#DADADA] opacity-90 font-medium">
+                    <li><a href="{{ route('events.search') }}" class="hover:text-[#C9A84C] transition">Semua Event</a></li>
+                    <li><a href="{{ route('events.search') }}?category=music_festival" class="hover:text-[#C9A84C] transition">Konser Musik</a></li>
+                    <li><a href="{{ route('events.search') }}?category=sports" class="hover:text-[#C9A84C] transition">Olahraga & Sports</a></li>
+                    <li><a href="{{ route('events.search') }}?category=arts_theater_culture" class="hover:text-[#C9A84C] transition">Seni & Teater</a></li>
+                </ul>
+            </div>
+            
+            <!-- Col 3: Penyelenggara -->
+            <div class="space-y-4">
+                <h4 class="text-sm font-bold text-[#C9A84C] uppercase tracking-wider font-semibold">UNTUK PROMOTER</h4>
+                <ul class="space-y-2 text-xs md:text-sm text-[#DADADA] opacity-90 font-medium">
+                    <li><a href="{{ route('promoter.apply') }}" class="hover:text-[#C9A84C] transition">Daftar Jadi Promoter</a></li>
+                    <li><a href="{{ route('ticket.guide') }}" class="hover:text-[#C9A84C] transition">Panduan Penjualan Tiket</a></li>
+                    <li><a href="#" class="hover:text-[#C9A84C] transition">Pusat Bantuan</a></li>
+                </ul>
+            </div>
+            
+            <!-- Col 4: Kontak & Socials -->
+            <div class="space-y-4">
+                <h4 class="text-sm font-bold text-[#C9A84C] uppercase tracking-wider font-semibold">HUBUNGI KAMI</h4>
+                <p class="text-xs md:text-sm text-[#DADADA] opacity-85 font-light">
+                    Gedung Creative Hub Jakarta<br>
+                    Email: <a href="mailto:support@tiketara.com" class="hover:text-[#C9A84C] underline">support@tiketara.com</a>
+                </p>
+                <div class="flex items-center gap-4 text-gray-400 mt-2">
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram text-lg"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-facebook text-lg"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-x-twitter text-lg"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-youtube text-lg"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Footer -->
+        <div class="w-full border-t border-[#202020] bg-[#020B18] py-6 text-center text-xs text-[#DADADA] px-4 md:px-8">
+            <div class="max-w-[1500px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p>© 2026 Tiketara. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="{{ route('privacy.policy') }}" class="hover:text-[#C9A84C] transition">Privacy Policy</a>
+                    <a href="{{ route('terms.service') }}" class="hover:text-[#C9A84C] transition">Terms of Service</a>
+                    <a href="#" class="hover:text-[#C9A84C] transition">Support</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
 </body>
