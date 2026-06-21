@@ -22,11 +22,28 @@
                 display: none !important;
             }
             
+            body, html {
+                margin: 0 !important;
+                padding: 0 !important;
+                height: 100% !important;
+            }
+            main {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .print-card {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin: 0 auto !important;
+                transform: scale(0.9);
+                transform-origin: top center;
+            }
+            
             /* Print rules for First Ticket only */
-            body.print-first-only .print-second-ticket-container {
+            .print-second-ticket-container {
                 display: none !important;
             }
-            body.print-first-only .print-card {
+            .print-card {
                 border: 2px solid #000000 !important;
                 background: white !important;
                 color: black !important;
@@ -34,23 +51,23 @@
                 margin: 0 auto !important;
                 border-radius: 0 !important;
             }
-            body.print-first-only .print-text-dark {
+            .print-text-dark {
                 color: black !important;
             }
-            body.print-first-only .print-border {
+            .print-border {
                 border-color: #000000 !important;
             }
-            body.print-first-only .print-badge {
+            .print-badge {
                 background: #f3f4f6 !important;
                 color: black !important;
                 border: 1px solid black !important;
             }
-            body.print-first-only .print-cutout {
+            .print-cutout {
                 display: none !important;
             }
             @page {
                 size: portrait;
-                margin: 10mm;
+                margin: 5mm;
             }
             
             /* Print rules for Second (Offline) Ticket only */
@@ -75,10 +92,6 @@
                 background: linear-gradient(135deg, #031d3a 0%, #0a3562 100%) !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-            }
-            @page {
-                size: landscape;
-                margin: 10mm;
             }
         }
     </style>
@@ -117,9 +130,9 @@
                 <div class="print-cutout absolute top-[68%] -right-4 w-8 h-8 rounded-full bg-[#020D1A] border-l border-[#202020] z-20"></div>
 
                 <!-- Top Event Cover & Details -->
-                <div class="relative aspect-[16/9] w-full bg-slate-900 overflow-hidden flex items-center justify-center border-b border-[#202020]">
+                <div class="relative aspect-[16/9] w-full bg-slate-900 overflow-hidden flex items-center justify-center print-border border-b border-[#202020]">
                     <img src="{{ $order->event->poster_url }}" alt="{{ $order->event->title }}" class="w-full h-full object-cover opacity-90">
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#031124] via-transparent to-black/50"></div>
+                    <div class="no-print absolute inset-0 bg-gradient-to-t from-[#031124] via-transparent to-black/50"></div>
                     <div class="absolute top-4 left-4">
                         <span class="print-badge bg-[#020D1A]/80 backdrop-blur-md text-[#C9A84C] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-[#C9A84C]/35">
                             E-Ticket
