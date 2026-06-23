@@ -33,19 +33,22 @@ class AuthController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // cek email sudah diverifikasi
-        if (is_null($user->email_verified_at)) {
-            Auth::logout();
-            return back()->withErrors([
-                'email' => 'Silakan verifikasi email terlebih dahulu'
-            ]);
-        }
+        // Email verification check dipindah ke profil agar user bisa login dan request resend email
+        // status active cukup untuk masuk ke aplikasi.
 
         // cek status akun
         if ($user->status !== 'active') {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'Akun belum aktif'
+            ]);
+        }
+
+        // cek apakah sudah diverifikasi
+        if (is_null($user->email_verified_at)) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Anda harus memverifikasi email Anda sebelum dapat masuk. Silakan cek kotak masuk Anda.'
             ]);
         }
 
@@ -74,21 +77,23 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok',
         ]);
 
-        // SIMULASI PRESENTASI: Akun langsung dibuat dengan status ACTIVE dan EMAIL VERIFIED
+        // Buat akun dengan status ACTIVE agar bisa login, namun belum diverifikasi (email_verified_at = null)
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'role' => 'buyer',
-            'status' => 'active', // Langsung active
-            'email_verified_at' => now(), // Langsung terverifikasi detik ini juga!
+            'status' => 'active', 
             'password' => Hash::make($request->password),
         ]);
 
-        // Otomatis langsung loginkan user setelah register
-        Auth::login($user);
+        // Kirim email verifikasi
+        $user->sendEmailVerificationNotification();
 
-        // Langsung lempar ke dashboard buyer dengan pesan sukses estetis
-        return redirect('/')->with('success', 'Registrasi Berhasil! Akun Anda telah otomatis diverifikasi melalui Google SMTP.');
+        // JANGAN otomatis login untuk mencegah bot
+        // Auth::login($user);
+
+        // Redirect ke halaman verifikasi email
+        return redirect()->route('verification.notice')->with('email', $request->email);
     }
 
     /**
@@ -103,9 +108,14 @@ class AuthController extends Controller
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if (!$user) {
-            return redirect('/register')->withErrors([
-                'email' => 'Email Google Anda belum terdaftar di Tiketara. Silakan buat akun terlebih dahulu!'
-            ]);
+            $user = new User();
+            $user->name = $googleUser->getName() ?? 'Pengguna Google';
+            $user->email = $googleUser->getEmail();
+            $user->password = \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(16));
+            $user->role = 'buyer';
+            $user->status = 'active';
+            $user->email_verified_at = now();
+            $user->save();
         }
 
         if ($user->status !== 'active') {
@@ -127,6 +137,7 @@ class AuthController extends Controller
         };
 
     } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Google OAuth Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
         return redirect('/login')->withErrors(['email' => 'Gagal terhubung ke Google. Silakan coba lagi.']);
     }
 }

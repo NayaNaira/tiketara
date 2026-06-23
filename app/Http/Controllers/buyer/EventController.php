@@ -109,11 +109,12 @@ class EventController extends Controller
     }
 
     // Menampilkan halaman detail event tertentu (detail.blade.php)
-    public function show($id)
+    public function show($slug)
     {
         $event = Event::with(['galleries', 'ticketTypes'])
             ->where('status', 'approved')
-            ->findOrFail($id);
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         return view('user.event.detail', compact('event'));
     }
@@ -136,6 +137,14 @@ class EventController extends Controller
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'quantity'       => 'required|integer|min:1|max:4',
         ]);
+
+        // Cek stok dinamis (Backend Validation)
+        $ticket = \App\Models\TicketType::findOrFail($request->ticket_type_id);
+        $availableStock = max(0, $ticket->quota - $ticket->sold);
+
+        if ($request->quantity > $availableStock) {
+            return back()->with('error', 'Maaf, sisa tiket tidak mencukupi. Sisa tiket: ' . $availableStock);
+        }
 
         session([
             'booking_ticket_type_id' => $request->ticket_type_id,

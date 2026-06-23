@@ -20,6 +20,7 @@ use App\Http\Controllers\super_admin\TransactionController;
 use App\Http\Controllers\super_admin\EventController as SuperEventController;
 use App\Http\Controllers\super_admin\AdminController; 
 use App\Http\Controllers\super_admin\ReportController;
+use App\Http\Controllers\super_admin\UserController;
 
 // Import Controller Promoter
 use App\Http\Controllers\promoter\EventController as PromoterEventController;
@@ -31,7 +32,7 @@ use App\Http\Controllers\promoter\EventController as PromoterEventController;
 */
 
 Route::get('/', function () {
-    $events = Event::with('ticketTypes')->get(); 
+    $events = Event::with('ticketTypes')->where('status', 'approved')->latest()->get(); 
     return view('welcome', compact('events'));
 });
 
@@ -50,7 +51,7 @@ Route::get('/ticket-selling-guide', function () {
 
 // Detail Event
 Route::get('/events', [BuyerEventController::class, 'search'])->name('events.search');
-Route::get('/event/{id}', [BuyerEventController::class, 'show'])->name('event.show');
+Route::get('/event/{slug}', [BuyerEventController::class, 'show'])->name('event.show');
 
 // Midtrans Payment Webhook (Notifikasi Otomatis dari Server Midtrans)
 Route::post('/buyer/payment/notification', [OrderController::class, 'paymentNotification']);
@@ -80,6 +81,15 @@ Route::post('/logout', function () {
     return redirect('/login');
 })->name('logout');
 
+/*
+|--------------------------------------------------------------------------
+| PASSWORD RESET ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::get('/forgot-password', [\App\Http\Controllers\ForgotPasswordController::class, 'showForgotForm'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password', [\App\Http\Controllers\ForgotPasswordController::class, 'sendResetLink'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [\App\Http\Controllers\ForgotPasswordController::class, 'showResetForm'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [\App\Http\Controllers\ForgotPasswordController::class, 'resetPassword'])->middleware('guest')->name('password.update');
 
 /*
 |--------------------------------------------------------------------------
@@ -87,18 +97,32 @@ Route::post('/logout', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/email/verify', fn () => view('auth.email-verification'))
-    ->middleware('auth')
     ->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return redirect('/login')->with('success', 'Email berhasil diverifikasi.');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
+    $user = \App\Models\User::findOrFail($id);
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        abort(403);
+    }
+    if (!$user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+    }
+    return redirect('/login')->with('success', 'Email berhasil diverifikasi. Silakan masuk.');
+})->middleware(['signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return back()->with('success', 'Link verifikasi dikirim ulang.');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::post('/email/resend-public', function (Request $request) {
+    $email = $request->input('email');
+    $user = \App\Models\User::where('email', $email)->first();
+    if ($user && !$user->hasVerifiedEmail()) {
+        $user->sendEmailVerificationNotification();
+    }
+    return back()->with('success', 'Link verifikasi dikirim ulang.')->with('email', $email);
+})->middleware('throttle:6,1')->name('verification.send.public');
 
 
 /*
@@ -165,6 +189,17 @@ Route::middleware(['auth'])->group(function () {
         // Export Laporan
         Route::get('/report', [ReportController::class, 'index'])->name('report');
         Route::get('/report/export', [ReportController::class, 'export'])->name('export');
+
+        // User Management (Promoters & Buyers)
+        Route::get('/promoters', [UserController::class, 'indexPromoters'])->name('promoters.index');
+        Route::post('/promoters/{id}/suspend', [UserController::class, 'toggleSuspend'])->name('promoters.suspend');
+        Route::post('/promoters/{id}/ban', [UserController::class, 'toggleBan'])->name('promoters.ban');
+        Route::delete('/promoters/{id}', [UserController::class, 'destroy'])->name('promoters.destroy');
+
+        Route::get('/buyers', [UserController::class, 'indexBuyers'])->name('buyers.index');
+        Route::post('/buyers/{id}/suspend', [UserController::class, 'toggleSuspend'])->name('buyers.suspend');
+        Route::post('/buyers/{id}/ban', [UserController::class, 'toggleBan'])->name('buyers.ban');
+        Route::delete('/buyers/{id}', [UserController::class, 'destroy'])->name('buyers.destroy');
     });
 
     // ====================================================================

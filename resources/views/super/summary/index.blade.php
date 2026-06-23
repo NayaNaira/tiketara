@@ -142,21 +142,23 @@
                         }
                     @endphp
                     
-                    <div class="event-summary-row flex items-center justify-between pb-4 border-b border-[#202020]"
+                    <div class="event-summary-row flex items-center pb-4 border-b border-[#202020]"
                          data-timestamp="{{ strtotime($event->event_date) }}"
                          data-revenue="{{ $revenue }}"
                          data-sold="{{ $sold }}"
                          data-status="{{ $liveStatus }}">
-                        <div class="max-w-[55%]">
+                        <div class="flex-1 min-w-0 pr-4">
                             <p class="text-[#DADADA] text-sm font-medium truncate">{{ $event->title }}</p>
-                            <p class="text-[10px] text-gray-500">{{ $eventDate->format('d M Y') }} - {{ $event->venue }}</p>
+                            <p class="text-[10px] text-gray-500 truncate">{{ $eventDate->format('d M Y') }} - {{ $event->venue }}</p>
                         </div>
-                        <div class="text-[#C9A84C] text-xs font-semibold whitespace-nowrap px-2">
+                        <div class="w-20 sm:w-24 text-center text-[#C9A84C] text-xs font-semibold whitespace-nowrap shrink-0">
                             {{ number_format($sold) }}/{{ number_format($capacity) }}
                         </div>
-                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full border text-[9px] font-bold tracking-wider uppercase {{ $badgeClass }}">
-                            {{ $liveStatus }}
-                        </span>
+                        <div class="w-24 flex justify-end shrink-0">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-full border text-[9px] font-bold tracking-wider uppercase w-full {{ $badgeClass }}">
+                                {{ $liveStatus }}
+                            </span>
+                        </div>
                     </div>
                 @empty
                     <p class="text-sm text-gray-500 italic text-center py-6">Tidak ada record konser terdaftar.</p>

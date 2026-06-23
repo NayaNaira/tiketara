@@ -50,13 +50,27 @@ class PromoterDashboardController extends Controller
             ->where('event_date', '<', now())
             ->count();
 
+        // Mengambil semua order berstatus lunas (paid) untuk promoter ini agar penghitungan filter periode akurat (berdasarkan tanggal transaksi)
+        $ordersJson = Order::whereHas('event', function ($q) use ($promoterId) {
+            $q->where('promoter_id', $promoterId);
+        })->where('status', 'paid')
+          ->get(['created_at', 'total_amount', 'quantity'])
+          ->map(function($order) {
+              return [
+                  'time' => $order->created_at->timestamp,
+                  'revenue' => (float)$order->total_amount,
+                  'quantity' => (int)$order->quantity
+              ];
+          })->toJson();
+
         return view('promoter.dashboard.summary', compact(
             'events',
             'totalRevenue',
             'totalTickets',
             'activeCount',
             'pendingCount',
-            'completedCount'
+            'completedCount',
+            'ordersJson'
         ));
     }
 
@@ -66,8 +80,9 @@ class PromoterDashboardController extends Controller
     public function reports(Request $request)
     {
         $promoterId = Auth::id();
+        $year = $request->get('period_year', date('Y'));
 
-        $events = Event::with(['ticketTypes', 'orders'])
+        $events = Event::with(['ticketTypes', 'orders.user'])
             ->where('promoter_id', $promoterId)
             ->where('status', '!=', 'draft')
             ->orderBy('created_at', 'desc')
@@ -78,10 +93,11 @@ class PromoterDashboardController extends Controller
             $event = Event::with(['ticketTypes', 'orders.user'])->where('promoter_id', $promoterId)->find($request->get('event_id'));
         }
 
-        // Hitung stats agregat untuk preview
+        // Hitung stats agregat untuk preview (Filtered by selected year!)
         $query = Order::whereHas('event', function ($q) use ($promoterId) {
             $q->where('promoter_id', $promoterId);
-        })->where('status', 'paid');
+        })->where('status', 'paid')
+          ->whereYear('created_at', $year);
 
         if ($event) {
             $query->where('events_id', $event->id);
@@ -93,29 +109,49 @@ class PromoterDashboardController extends Controller
             'success_ratio' => 100
         ];
 
-        // Hitung grafik bulanan penjualan tiket untuk preview
-        $currentYear = date('Y');
+        // Hitung grafik bulanan penjualan tiket untuk preview (Filtered by selected year!)
         $monthlyData = [];
+        $rawMonthlySales = [];
         for ($month = 1; $month <= 12; $month++) {
             $monthQuery = Order::whereHas('event', function ($q) use ($promoterId) {
                 $q->where('promoter_id', $promoterId);
             })->where('status', 'paid')
-              ->whereYear('created_at', $currentYear)
+              ->whereYear('created_at', $year)
               ->whereMonth('created_at', $month);
 
             if ($event) {
                 $monthQuery->where('events_id', $event->id);
             }
 
-            $monthlyData[] = $monthQuery->sum('quantity');
+            $rawMonthlySales[] = $monthQuery->sum('quantity');
         }
 
-        $maxSales = max($monthlyData) > 0 ? max($monthlyData) : 1;
-        $monthlyData = array_map(function ($value) use ($maxSales) {
-            return ($value / $maxSales) * 100;
-        }, $monthlyData);
+        $maxSales = max($rawMonthlySales) > 0 ? max($rawMonthlySales) : 1;
+        for ($month = 1; $month <= 12; $month++) {
+            $count = $rawMonthlySales[$month - 1];
+            $monthlyData[] = [
+                'count' => $count,
+                'percent' => ($count / $maxSales) * 100
+            ];
+        }
 
-        return view('promoter.dashboard.reports', compact('events', 'event', 'stats', 'monthlyData'));
+        // Query 10 orders terbaru sesuai filter tahun & event untuk menghindari N+1 query loop
+        $ordersQuery = Order::with(['user', 'event'])
+            ->whereHas('event', function ($q) use ($promoterId) {
+                $q->where('promoter_id', $promoterId);
+            })
+            ->where('status', 'paid')
+            ->whereYear('created_at', $year)
+            ->latest('created_at')
+            ->limit(10);
+
+        if ($event) {
+            $ordersQuery->where('events_id', $event->id);
+        }
+
+        $previewOrders = $ordersQuery->get();
+
+        return view('promoter.dashboard.reports', compact('events', 'event', 'stats', 'monthlyData', 'previewOrders', 'year'));
     }
 
     /**

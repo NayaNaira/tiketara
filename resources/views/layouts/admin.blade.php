@@ -35,6 +35,9 @@
                 $navItems = [
                     ['route' => 'super.events.index', 'label' => 'Daftar Acara', 'active' => str_starts_with($currentRoute, 'super.events')],
                     ['route' => 'super.transactions.index', 'label' => 'Daftar Transaksi', 'active' => str_starts_with($currentRoute, 'super.transactions')],
+                    ['route' => 'super.promoters.index', 'label' => 'Kelola Promoter', 'active' => str_starts_with($currentRoute, 'super.promoters')],
+                    ['route' => 'super.buyers.index', 'label' => 'Kelola Buyer', 'active' => str_starts_with($currentRoute, 'super.buyers')],
+                    ['route' => 'super.promoter.requests', 'label' => 'Persetujuan Promoter', 'active' => str_starts_with($currentRoute, 'super.promoter.requests')],
                     ['route' => 'super.summary', 'label' => 'Ringkasan', 'active' => $currentRoute == 'super.summary'],
                     ['route' => 'super.reports.index', 'label' => 'Laporan', 'active' => str_starts_with($currentRoute, 'super.reports') && $currentRoute != 'super.export'],
                     ['route' => 'super.export', 'label' => 'Export Laporan', 'active' => $currentRoute == 'super.export'],

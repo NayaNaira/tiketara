@@ -53,45 +53,40 @@
             </div>
 
             <!-- Title -->
-            <h2 class="text-[#C9A84C] text-2xl font-semibold mb-4">
-                Check Your Email
+            <h2 class="text-[#C9A84C] text-2xl font-semibold mb-4 text-center">
+                Cek Email Anda
             </h2>
 
+            @if(session('success'))
+                <div class="mb-4 bg-green-500/10 border border-green-500/50 text-green-500 text-sm p-3 rounded-lg text-center">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <!-- Description -->
-            <div class="text-[#4A9FD4] text-sm leading-6 mb-6">
-
-                <p>
-                    Kami mengirim link verifikasi
+            <div class="text-[#4A9FD4] text-sm leading-6 mb-6 text-center">
+                <p>Kami telah mengirimkan link verifikasi ke:</p>
+                <p class="font-bold text-white my-1">
+                    {{ session('email', 'Email Anda') }}
                 </p>
-
-                <p class="font-medium">
-                    zara@gmail.com
-                </p>
-
-                <p>
-                    Silakan klik tautan untuk
-                </p>
-
-                <p>
-                    menyelesaikan pendaftaran Anda.
-                </p>
-
+                <p>Silakan klik tautan di dalamnya untuk mengaktifkan akun Anda.</p>
             </div>
 
             <!-- Button -->
-            <button
-                class="w-full bg-[#C9A84C] hover:opacity-90 transition text-white font-medium py-3 rounded-md">
-
-                Kirim Ulang Verifikasi
-
-            </button>
+            <form method="POST" action="{{ route('verification.send.public') }}">
+                @csrf
+                <input type="hidden" name="email" value="{{ session('email') }}">
+                <button type="submit" class="w-full bg-[#C9A84C] hover:opacity-90 transition text-[#020D1A] font-bold py-3 rounded-lg cursor-pointer">
+                    Kirim Ulang Email
+                </button>
+            </form>
 
             <!-- Footer -->
-            <p class="text-[#4A9FD4] text-xs mt-5 leading-5">
-                Anda dapat meminta tautan baru
-                dalam 60 detik.
-            </p>
-
+            <div class="mt-5 text-center">
+                <a href="{{ route('login') }}" class="text-[#4A9FD4] hover:text-white text-xs underline">
+                    Kembali ke halaman Login
+                </a>
+            </div>
         </div>
 
     </div>

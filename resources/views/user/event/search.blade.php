@@ -244,18 +244,31 @@
                     <!-- RESULTS GRID -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         @forelse ($events as $event)
-                        <a href="{{ route('event.show', $event->id) }}" class="group bg-[#031124] border border-[#202020] rounded-2xl overflow-hidden hover:border-[#C9A84C] transition duration-300 flex flex-col h-full">
+                        <a href="{{ route('event.show', $event->slug) }}" class="group bg-[#031124] border border-[#202020] rounded-2xl overflow-hidden hover:border-[#C9A84C] transition duration-300 flex flex-col h-full">
                             
+                            @php
+                                $endDateTime = \Carbon\Carbon::parse($event->event_date->format('Y-m-d') . ' ' . ($event->end_time ?? '23:59:59'));
+                                $isEventEnded = $endDateTime->isPast();
+                            @endphp
+
                             <!-- Poster Container -->
                             <div class="aspect-[16/10] w-full overflow-hidden relative bg-slate-900 border-b border-[#202020] flex items-center justify-center">
-                                <img src="{{ $event->poster_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                                <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#0c1e35] to-[#1a3a60] text-slate-400 p-3 text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-2 text-[#C9A84C]">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z" />
-                                    </svg>
-                                    <span class="text-[10px] font-bold tracking-wider uppercase text-slate-300">TIKETARA</span>
-                                </div>
-                                <div class="absolute top-2.5 left-2.5">
+                                <img src="{{ $event->poster_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover {{ $isEventEnded ? 'opacity-40 grayscale' : 'group-hover:scale-105 transition duration-500' }}" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                
+                                @if($isEventEnded)
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 z-10">
+                                        <span class="text-white font-bold tracking-widest text-sm md:text-base uppercase">Event Berakhir</span>
+                                    </div>
+                                @else
+                                    <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#0c1e35] to-[#1a3a60] text-slate-400 p-3 text-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-2 text-[#C9A84C]">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375 0 11-.75 0 .375 0 01.75 0z" />
+                                        </svg>
+                                        <span class="text-[10px] font-bold tracking-wider uppercase text-slate-300">TIKETARA</span>
+                                    </div>
+                                @endif
+
+                                <div class="absolute top-2.5 left-2.5 z-20">
                                     <span class="bg-[#020D1A]/85 backdrop-blur-md text-[#C9A84C] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-[#C9A84C]/25">
                                         {{ $categories[$event->category] ?? str_replace('_', ' ', $event->category) }}
                                     </span>
@@ -263,7 +276,7 @@
                             </div>
                             
                             <!-- Card Details -->
-                            <div class="p-4 flex flex-col flex-1">
+                            <div class="p-4 flex flex-col flex-1 relative z-20">
                                 <h3 class="font-bold text-sm md:text-base mb-1 text-white group-hover:text-[#C9A84C] transition duration-300 line-clamp-1 uppercase tracking-wide">
                                     {{ $event->title }}
                                 </h3>
@@ -280,26 +293,34 @@
                                 
                                 <div class="h-[1px] w-full bg-[#1A2639] mb-4 mt-auto"></div>
                                 
-                                <div class="flex justify-between items-center pb-1">
-                                    <div>
-                                        <p class="text-[10px] text-gray-400 mb-0.5">Mulai dari</p>
-                                        @php
-                                            $minPrice = $event->ticketTypes ? $event->ticketTypes->min('price') : 0;
-                                        @endphp
-                                        <p class="text-[#C9A84C] font-bold text-sm md:text-base tracking-wide">
-                                            @if($minPrice == 0)
-                                                Gratis
-                                            @else
-                                                Rp {{ number_format($minPrice, 0, ',', '.') }}
-                                            @endif
-                                        </p>
+                                @if($isEventEnded)
+                                    <div class="w-full">
+                                        <div class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold py-2.5 rounded text-center text-xs tracking-widest uppercase transition shadow-[0_0_10px_rgba(201,168,76,0.3)]">
+                                            LIHAT DETAIL
+                                        </div>
                                     </div>
-                                    <div class="bg-[#C9A84C] w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white group-hover:scale-105 transition shadow-md">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 md:w-4 md:h-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-                                        </svg>
+                                @else
+                                    <div class="flex justify-between items-center pb-1">
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 mb-0.5">Mulai dari</p>
+                                            @php
+                                                $minPrice = $event->ticketTypes ? $event->ticketTypes->min('price') : 0;
+                                            @endphp
+                                            <p class="text-[#C9A84C] font-bold text-sm md:text-base tracking-wide">
+                                                @if($minPrice == 0)
+                                                    Gratis
+                                                @else
+                                                    Rp {{ number_format($minPrice, 0, ',', '.') }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="bg-[#C9A84C] w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white group-hover:scale-105 transition shadow-md">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 md:w-4 md:h-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                                            </svg>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                         </a>
                         @empty

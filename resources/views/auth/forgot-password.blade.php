@@ -35,13 +35,25 @@
 
             <!-- Description -->
             <p class="text-[#4A9FD4] text-center text-sm leading-6 mb-8">
-                Mohon masukan username atau Email
+                Mohon masukan Email
                 <br>
                 untuk mengatur ulang password
             </p>
 
+            @if(session('success'))
+                <div class="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-sm rounded-xl text-center">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-300 text-sm rounded-xl text-center">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
             <!-- Form -->
-            <form action="#" method="POST">
+            <form action="{{ route('password.email') }}" method="POST">
 
                 @csrf
 

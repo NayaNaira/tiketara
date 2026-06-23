@@ -36,8 +36,16 @@
                 Masukkan kata sandi baru untuk email Anda
             </p>
 
-            <form action="#" method="POST" class="space-y-4">
+            @if($errors->any())
+                <div class="mb-8 p-3 bg-red-500/20 border border-red-500/50 text-red-300 text-sm rounded-xl text-center">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
                 @csrf
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ request()->email }}">
                 
                 <div class="relative flex items-center">
                     <span class="absolute left-4 text-gray-400">

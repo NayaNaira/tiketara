@@ -38,8 +38,18 @@
         </div>
     </header>
 
-    <section class="relative bg-gradient-to-r from-[#041830] to-[#2D4F78] pt-24 pb-6">
-        <div class="max-w-6xl mx-auto px-8">
+    <section class="relative pt-24 pb-6 overflow-hidden bg-[#020b18] min-h-[340px] flex items-center">
+        <!-- Blur Background to fill landscape space -->
+        <div class="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-30 transition duration-700" style="background-image: url('{{ $event->hero_banner_url }}');"></div>
+        
+        <!-- Background Hero Banner Image (Overlay) -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('{{ $event->hero_banner_url }}');"></div>
+
+        <!-- Gradient Overlays for readability -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#020b18] via-[#020b18]/80 to-transparent z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#020b18] via-transparent to-transparent z-10"></div>
+
+        <div class="max-w-6xl mx-auto px-8 w-full relative z-20">
             <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
                 <!-- KIRI -->
                 <div class="w-full lg:w-[55%]">
@@ -124,7 +134,7 @@
                 <div class="grid grid-cols-3 sm:grid-cols-4 gap-4">
                     @foreach($event->galleries as $gallery)
                     <div class="aspect-square rounded-lg overflow-hidden bg-gray-900 border border-gray-800 relative flex items-center justify-center">
-                        <img src="{{ $gallery->image_url }}" class="w-full h-full object-cover hover:scale-110 transition duration-300" alt="Gallery" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                        <img src="{{ $gallery->image_url }}" class="gallery-image w-full h-full object-cover cursor-pointer transition duration-200 hover:opacity-80" alt="Gallery" onclick="openLightbox({{ $loop->index }})" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
                         <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#041020] to-[#0c1e35] text-slate-500 text-center">
                             <i class="fa-regular fa-image text-xl mb-1 text-[#cca43b]/70"></i>
                             <span class="text-[9px] uppercase tracking-wider font-semibold text-slate-400">Gallery</span>
@@ -147,40 +157,61 @@
         <!-- SIDEBAR TIKET -->
         <div class="space-y-8">
             <div class="bg-[#020b18] border border-[#1e3a5f] rounded-xl p-5 shadow-xl space-y-6">
-                <h3 class="text-[#cca43b] text-sm font-bold tracking-wider uppercase">Kategori Tiket</h3>
                 
-                <div class="space-y-4">
-                    @forelse($event->ticketTypes as $ticket)
-                    <div class="flex justify-between items-center pb-3 border-b border-gray-900">
-                        <div>
-                            <p class="text-xs font-semibold text-gray-200">{{ $ticket->ticket_name }}</p>
-                            <p class="text-sm font-bold text-[#cca43b] mt-0.5">Rp {{ number_format($ticket->price, 0, ',', '.') }}</p>
-                        </div>
-                        
-                        <!-- Logika Stok Tiket -->
-                        @if($ticket->quota <= 0)
-                            <span class="text-[10px] text-white font-medium bg-red-600 px-2 py-0.5 rounded">Habis!</span>
-                        @elseif($ticket->quota <= 5)
-                            <span class="text-[10px] text-red-500 font-medium bg-red-500/10 px-2 py-0.5 rounded">Sisa {{ $ticket->quota }}!</span>
-                        @else
-                            <span class="text-[10px] text-gray-400 font-medium bg-gray-800 px-2 py-0.5 rounded">{{ $ticket->quota }} Tiket</span>
-                        @endif
-                    </div>
-                    @empty
-                    <p class="text-xs text-gray-500 italic">Tiket belum tersedia.</p>
-                    @endforelse
-                </div>
+                @php
+                    $endDateTime = \Carbon\Carbon::parse($event->event_date->format('Y-m-d') . ' ' . ($event->end_time ?? '23:59:59'));
+                    $isEventEnded = $endDateTime->isPast();
+                @endphp
 
-                <!-- Tombol Transaksi -->
-                @if($event->ticketTypes->sum('quota') > 0)
-                <a href="{{ route('buyer.ticket.select', $event->id) }}" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3 rounded-lg flex items-center justify-center space-x-2 transition shadow-md group uppercase tracking-wider">
-                    <span>BELI TIKET SEKARANG</span>
-                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                </a>
+                @if($isEventEnded)
+                    <div class="text-center py-2 space-y-4">
+                        <div class="text-[#4A9FD4] font-bold text-base uppercase tracking-widest drop-shadow-md">
+                            EVENT TELAH BERAKHIR
+                        </div>
+                        <p class="text-gray-400 text-xs leading-relaxed">Terima kasih atas antusiasme Anda. Event ini telah selesai diselenggarakan.</p>
+                    </div>
+                    <a href="{{ route('events.search') }}" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3 rounded-lg flex items-center justify-center space-x-2 transition shadow-md group uppercase tracking-widest">
+                        <span>LIHAT EVENT LAINNYA</span>
+                        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                    </a>
                 @else
-                <button disabled class="w-full bg-gray-800 text-gray-500 font-bold text-xs py-3 rounded-lg cursor-not-allowed uppercase tracking-wider">
-                    TIKET HABIS TERJUAL
-                </button>
+                    <h3 class="text-[#cca43b] text-sm font-bold tracking-wider uppercase">Kategori Tiket</h3>
+                    
+                    <div class="space-y-4">
+                        @forelse($event->ticketTypes as $ticket)
+                        <div class="flex justify-between items-center pb-3 border-b border-gray-900">
+                            <div>
+                                <p class="text-xs font-semibold text-gray-200">{{ $ticket->ticket_name ?? $ticket->name }}</p>
+                                <p class="text-sm font-bold text-[#cca43b] mt-0.5">Rp {{ number_format($ticket->price, 0, ',', '.') }}</p>
+                            </div>
+                            
+                            <!-- Logika Stok Tiket -->
+                            @php $availableStock = max(0, $ticket->quota - $ticket->sold); @endphp
+                            @if($availableStock <= 0)
+                                <span class="text-[10px] text-white font-medium bg-red-600 px-2 py-0.5 rounded">Habis!</span>
+                            @elseif($availableStock <= 5)
+                                <span class="text-[10px] text-red-500 font-medium bg-red-500/10 px-2 py-0.5 rounded">Sisa {{ $availableStock }}!</span>
+                            @else
+                                <span class="text-[10px] text-gray-400 font-medium bg-gray-800 px-2 py-0.5 rounded">{{ $availableStock }} Tiket</span>
+                            @endif
+                        </div>
+                        @empty
+                        <p class="text-xs text-gray-500 italic">Tiket belum tersedia.</p>
+                        @endforelse
+                    </div>
+
+                    <!-- Tombol Transaksi -->
+                    @php $totalStock = $event->ticketTypes->sum(function($t) { return max(0, $t->quota - $t->sold); }); @endphp
+                    @if($totalStock > 0)
+                    <a href="{{ route('buyer.ticket.select', $event->id) }}" class="w-full bg-[#cca43b] hover:bg-[#b08b30] text-black font-bold text-xs py-3 rounded-lg flex items-center justify-center space-x-2 transition shadow-md group uppercase tracking-wider">
+                        <span>BELI TIKET SEKARANG</span>
+                        <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    @else
+                    <button disabled class="w-full bg-gray-800 text-gray-500 font-bold text-xs py-3 rounded-lg cursor-not-allowed uppercase tracking-wider">
+                        TIKET HABIS TERJUAL
+                    </button>
+                    @endif
                 @endif
             </div>
 
@@ -261,5 +292,100 @@
         </div>
     </footer>
 
+    <!-- Lightbox Modal -->
+    <div id="galleryLightbox" class="fixed inset-0 bg-black/90 z-[9999] hidden flex items-center justify-center p-4">
+        <!-- Close Button -->
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/70 hover:text-white text-3xl focus:outline-none transition cursor-pointer">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Previous Button -->
+        <button onclick="prevLightboxImage()" class="absolute left-6 text-white/70 hover:text-white text-4xl focus:outline-none transition cursor-pointer p-2">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <!-- Image Container -->
+        <div class="max-w-4xl max-h-[80vh] flex items-center justify-center relative">
+            <img id="lightboxImage" src="" alt="Gallery Preview" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl">
+        </div>
+
+        <!-- Next Button -->
+        <button onclick="nextLightboxImage()" class="absolute right-6 text-white/70 hover:text-white text-4xl focus:outline-none transition cursor-pointer p-2">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Image Counter -->
+        <div class="absolute bottom-6 text-white/50 text-xs font-semibold tracking-wider uppercase">
+            Gambar <span id="lightboxCounter">1 / 1</span>
+        </div>
+    </div>
+
+    <script>
+        let galleryImages = [];
+        let currentLightboxIndex = 0;
+
+        function openLightbox(index) {
+            galleryImages = [];
+            const imgElements = document.querySelectorAll('.gallery-image');
+            imgElements.forEach(img => {
+                if (img.style.display !== 'none') {
+                    galleryImages.push(img.src);
+                }
+            });
+
+            if (galleryImages.length === 0) return;
+
+            const clickedSrc = imgElements[index].src;
+            currentLightboxIndex = galleryImages.indexOf(clickedSrc);
+            if (currentLightboxIndex === -1) currentLightboxIndex = 0;
+
+            updateLightbox();
+            document.getElementById('galleryLightbox').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('galleryLightbox').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightbox() {
+            if (galleryImages.length === 0) return;
+            document.getElementById('lightboxImage').src = galleryImages[currentLightboxIndex];
+            document.getElementById('lightboxCounter').textContent = `${currentLightboxIndex + 1} / ${galleryImages.length}`;
+        }
+
+        function nextLightboxImage() {
+            if (galleryImages.length === 0) return;
+            currentLightboxIndex = (currentLightboxIndex + 1) % galleryImages.length;
+            updateLightbox();
+        }
+
+        function prevLightboxImage() {
+            if (galleryImages.length === 0) return;
+            currentLightboxIndex = (currentLightboxIndex - 1 + galleryImages.length) % galleryImages.length;
+            updateLightbox();
+        }
+
+        // Close on ESC, click backdrop, or arrow navigation
+        document.addEventListener('keydown', function(event) {
+            const lightbox = document.getElementById('galleryLightbox');
+            if (lightbox && !lightbox.classList.contains('hidden')) {
+                if (event.key === 'Escape') {
+                    closeLightbox();
+                } else if (event.key === 'ArrowRight') {
+                    nextLightboxImage();
+                } else if (event.key === 'ArrowLeft') {
+                    prevLightboxImage();
+                }
+            }
+        });
+
+        document.getElementById('galleryLightbox').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeLightbox();
+            }
+        });
+    </script>
 </body>
 </html>

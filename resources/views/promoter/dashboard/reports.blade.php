@@ -113,14 +113,14 @@
                             @php
                                 $months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
                             @endphp
-                            @foreach($monthlyData as $idx => $percent)
+                            @foreach($monthlyData as $idx => $data)
                                 <div class="flex-1 flex flex-col items-center group relative h-full justify-end">
                                     {{-- Tooltip info --}}
                                     <div class="absolute bottom-full mb-1 bg-black text-white text-[9px] rounded py-0.5 px-1.5 opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-10 pointer-events-none border border-[#4A9FD4]/20 shadow-md">
-                                        {{ round($percent) }}% Sales Max
+                                        {{ number_format($data['count']) }} Tiket
                                     </div>
                                     {{-- Bar --}}
-                                    <div class="w-full bg-[#4A9FD4] hover:bg-[#C9A84C] rounded-t transition-all duration-500" style="height: {{ max($percent, 3) }}%"></div>
+                                    <div class="w-full bg-[#4A9FD4] hover:bg-[#C9A84C] rounded-t transition-all duration-500" style="height: {{ max($data['percent'], 3) }}%"></div>
                                     <span class="text-[9px] text-gray-500 mt-2 font-medium">{{ $months[$idx] }}</span>
                                 </div>
                             @endforeach
@@ -146,14 +146,6 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#202020] text-[#DADADA]">
-                            @php
-                                $previewOrders = $event 
-                                    ? $event->orders->where('status', 'paid') 
-                                    : $events->flatMap(function($e) { return $e->orders; })->where('status', 'paid');
-                                
-                                $previewOrders = $previewOrders->sortByDesc('created_at')->take(10);
-                            @endphp
-
                             @forelse($previewOrders as $order)
                                 <tr class="hover:bg-[#020D1A]/40 transition">
                                     <td class="p-3 font-semibold text-[#4A9FD4]">#{{ $order->id }}</td>
