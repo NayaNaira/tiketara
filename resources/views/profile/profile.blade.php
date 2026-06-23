@@ -135,6 +135,17 @@
                     <div class="w-full space-y-3.5 text-xs text-left">
                         <div class="flex justify-between items-center py-1">
                             <span class="text-gray-400 flex items-center gap-2">
+                                <i class="fa-solid fa-envelope-circle-check text-gray-500 w-4"></i>Status Email
+                            </span>
+                            @if($user->email_verified_at)
+                                <span class="font-semibold text-green-400 flex items-center gap-1"><i class="fa-solid fa-check text-[10px]"></i>Terverifikasi</span>
+                            @else
+                                <span class="font-semibold text-red-400 flex items-center gap-1"><i class="fa-solid fa-xmark text-[10px]"></i>Belum Verifikasi</span>
+                            @endif
+                        </div>
+
+                        <div class="flex justify-between items-center py-1">
+                            <span class="text-gray-400 flex items-center gap-2">
                                 <i class="fa-regular fa-id-card text-gray-500 w-4"></i>NIK KTP
                             </span>
                             <span class="font-semibold text-gray-200">{{ $user->nik ?? '-' }}</span>
@@ -191,7 +202,26 @@
                 
                 <!-- Promoter Apply Info Callout (Only for Buyers) -->
                 @if($user->role !== 'super_admin' && $user->role !== 'promoter')
-                    @if($user->promoter_status == 'none' || $user->promoter_status == 'rejected')
+                    @if(is_null($user->email_verified_at))
+                        <!-- Warning Verifikasi Email -->
+                        <div class="relative bg-gradient-to-r from-[#1A0B12] to-[#2D0D16] border border-red-500/35 rounded-3xl p-6 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <div class="space-y-1 text-center sm:text-left">
+                                <span class="bg-red-500/15 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded border border-red-500/25 uppercase tracking-wider flex items-center w-max mx-auto sm:mx-0 gap-1.5">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Menunggu Verifikasi
+                                </span>
+                                <h3 class="text-sm font-bold text-white mt-1.5">Verifikasi Email Anda</h3>
+                                <p class="text-xs text-gray-400 max-w-md">
+                                    Untuk dapat mengajukan diri sebagai Promoter atau melakukan aksi penting lainnya, Anda wajib memverifikasi alamat email Anda terlebih dahulu.
+                                </p>
+                            </div>
+                            <form action="{{ route('verification.send') }}" method="POST" class="shrink-0 m-0">
+                                @csrf
+                                <button type="submit" class="bg-red-500 text-white text-xs font-bold px-5 py-2.5 rounded-full hover:bg-red-600 transition uppercase tracking-wider shadow-md flex items-center gap-2 cursor-pointer">
+                                    <i class="fa-regular fa-envelope"></i> Kirim Ulang Email
+                                </button>
+                            </form>
+                        </div>
+                    @elseif($user->promoter_status == 'none' || $user->promoter_status == 'rejected')
                         <div class="relative bg-gradient-to-r from-[#031124] to-[#0d1e33] border border-[#C9A84C]/35 rounded-3xl p-6 shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
                             <div class="space-y-1 text-center sm:text-left">
                                 <span class="bg-[#C9A84C]/15 text-[#C9A84C] text-[9px] font-bold px-2 py-0.5 rounded border border-[#C9A84C]/25 uppercase tracking-wider">

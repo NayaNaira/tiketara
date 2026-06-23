@@ -41,22 +41,33 @@ class EventController extends Controller
             'event_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
+            'age_rating' => 'required',
             'max_ticket_per_order' => 'required|integer|min:1',
             'terms_and_conditions' => 'required',
             'poster' => 'required|image|max:2048',
+            'hero_banner' => 'nullable|image|max:2048',
             // Validasi array untuk tiket
             'ticket_name' => 'required|array',
             'ticket_name.*' => 'required|string',
+            'ticket_type_price' => 'required|array',
             'ticket_type_price.*' => 'required|numeric|min:0',
+            'ticket_type_quota' => 'required|array',
+            'ticket_type_quota.*' => 'required|integer|min:1',
         ]);
 
         try {
-            DB::transaction(function () use ($request, $validated) {
-                // 1. Simpan Poster & Event
+            DB::transaction(function () use ($request, &$validated) {
                 $posterPath = $request->file('poster')->store('events/posters', 'public');
                 $validated['poster_path'] = $posterPath;
+                
+                if ($request->hasFile('hero_banner')) {
+                    $heroPath = $request->file('hero_banner')->store('events/hero_banners', 'public');
+                    $validated['hero_banner_path'] = $heroPath;
+                }
+
                 $validated['promoter_id'] = Auth::id();
-                $validated['status'] = 'draft';
+                // Jika action = draft, status draft. Jika tidak, status pending.
+                $validated['status'] = $request->input('action') === 'draft' ? 'draft' : 'pending';
 
                 $event = Event::create($validated);
 
@@ -68,8 +79,8 @@ class EventController extends Controller
                             'name' => $name,
                             'price' => $request->ticket_type_price[$index],
                             'quota' => $request->ticket_type_quota[$index],
-                            'start_sale' => $request->start_sale[$index],
-                            'end_sale' => $request->end_sale[$index],
+                            'start_sale' => $request->start_sale[$index] ?? now(),
+                            'end_sale' => $request->end_sale[$index] ?? now()->addMonth(),
                         ]);
                     }
                 }
@@ -86,10 +97,9 @@ class EventController extends Controller
                 }
             });
 
-            // Ganti JSON ke Redirect agar form HTML kembali ke tampilan web
-            return redirect()->route('promoter.event.index')->with('success', 'Draft event beserta tiket berhasil dibuat.');
+            $msg = $request->input('action') === 'draft' ? 'Draft event berhasil dibuat.' : 'Event berhasil diajukan untuk direview.';
+            return redirect()->route('promoter.event.index')->with('success', $msg);
         } catch (\Exception $e) {
-            // Kalau gagal, kembalikan ke form beserta errornya
             return back()->withInput()->withErrors(['error' => 'Gagal menyimpan data: ' . $e->getMessage()]);
         }
     }
@@ -136,23 +146,36 @@ class EventController extends Controller
             'event_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
+            'age_rating' => 'required',
             'max_ticket_per_order' => 'required|integer|min:1',
             'terms_and_conditions' => 'required',
             'poster' => 'nullable|image|max:2048',
+            'hero_banner' => 'nullable|image|max:2048',
             // Validasi array untuk tiket
             'ticket_name' => 'required|array',
             'ticket_name.*' => 'required|string',
+            'ticket_type_price' => 'required|array',
             'ticket_type_price.*' => 'required|numeric|min:0',
+            'ticket_type_quota' => 'required|array',
+            'ticket_type_quota.*' => 'required|integer|min:1',
         ]);
 
         try {
             DB::transaction(function () use ($request, $event, $validated) {
-                $updateData = $request->except(['_token', '_method', 'poster', 'ticket_name', 'ticket_type_price', 'ticket_type_quota', 'start_sale', 'end_sale', 'gallery', 'artist_dummy', 'genre_dummy']);
+                $updateData = $request->except(['_token', '_method', 'poster', 'hero_banner', 'ticket_name', 'ticket_type_price', 'ticket_type_quota', 'start_sale', 'end_sale', 'gallery', 'artist_dummy', 'genre_dummy']);
                 
                 // 1. Update Poster jika ada file baru
                 if ($request->hasFile('poster')) {
                     if ($event->poster_path) Storage::disk('public')->delete($event->poster_path);
                     $updateData['poster_path'] = $request->file('poster')->store('events/posters', 'public');
+                }
+
+                if ($request->has('remove_hero_banner') && $request->remove_hero_banner == '1') {
+                    if ($event->hero_banner_path) Storage::disk('public')->delete($event->hero_banner_path);
+                    $updateData['hero_banner_path'] = null;
+                } elseif ($request->hasFile('hero_banner')) {
+                    if ($event->hero_banner_path) Storage::disk('public')->delete($event->hero_banner_path);
+                    $updateData['hero_banner_path'] = $request->file('hero_banner')->store('events/hero_banners', 'public');
                 }
 
                 $event->update($updateData);

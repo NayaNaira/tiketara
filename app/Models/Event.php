@@ -11,9 +11,11 @@ class Event extends Model
 
     protected $fillable = [
     'promoter_id',
+    'slug',
     'title',
     'description',
     'category',
+    'age_rating',
 
     'venue_name',
     'address',
@@ -26,6 +28,7 @@ class Event extends Model
     'max_ticket_per_order',
 
     'poster_path',
+    'hero_banner_path',
 
     'status',
     'rejection_reason',
@@ -34,6 +37,39 @@ class Event extends Model
     protected $casts = [
         'event_date' => 'date',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($event) {
+            if (empty($event->slug)) {
+                $event->slug = static::generateUniqueSlug($event->title);
+            }
+        });
+
+        static::updating(function ($event) {
+            if ($event->isDirty('title')) {
+                $event->slug = static::generateUniqueSlug($event->title, $event->id);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug($title, $ignoreId = 0)
+    {
+        $baseSlug = \Illuminate\Support\Str::slug($title);
+        $randomStr = \Illuminate\Support\Str::random(6);
+        $slug = "{$baseSlug}-{$randomStr}";
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)->where('id', '!=', $ignoreId)->exists()) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+
+        return $slug;
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -70,5 +106,17 @@ class Event extends Model
             return $this->poster_path;
         }
         return asset('storage/' . $this->poster_path);
+    }
+
+    public function getHeroBannerUrlAttribute()
+    {
+        if (empty($this->hero_banner_path)) {
+            // Fallback to poster
+            return $this->poster_url;
+        }
+        if (str_starts_with($this->hero_banner_path, 'http') || str_starts_with($this->hero_banner_path, 'https')) {
+            return $this->hero_banner_path;
+        }
+        return asset('storage/' . $this->hero_banner_path);
     }
 }

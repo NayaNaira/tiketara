@@ -98,7 +98,7 @@
                         Ingat Saya
                     </label>
 
-                    <a href="/forgot-password" class="text-xs sm:text-sm text-[#4A9FD4] hover:text-cyan-300 hover:underline transition whitespace-nowrap">
+                    <a href="{{ route('password.request') }}" class="text-xs sm:text-sm text-[#4A9FD4] hover:text-cyan-300 hover:underline transition whitespace-nowrap">
                         Lupa Password?
                     </a>
                 </div>

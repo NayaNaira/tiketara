@@ -57,24 +57,39 @@
             <div class="w-full text-center">
                 <h2 class="text-xxs font-bold tracking-widest text-[#cca43b] uppercase mb-4">Pilih Kategori Tiket</h2>
                 
+                @if(session('error'))
+                    <div class="mb-4 bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-lg text-center font-bold">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <div class="space-y-3 text-left">
+                    @php $hasChecked = false; @endphp
                     @forelse($event->ticketTypes as $index => $ticket)
-                    <label class="block relative border border-[#1e3a5f] rounded-xl p-4 bg-[#020b18] cursor-pointer hover:bg-white/5 transition group">
-                        <input type="radio" name="ticket_type_id" value="{{ $ticket->id }}" class="sr-only peer" required {{ $index === 0 ? 'checked' : '' }}>
+                    @php
+                        $availableStock = max(0, $ticket->quota - $ticket->sold);
+                        $isSoldOut = $availableStock <= 0;
+                        $checkStatus = '';
+                        if (!$isSoldOut && !$hasChecked) {
+                            $checkStatus = 'checked';
+                            $hasChecked = true;
+                        }
+                    @endphp
+                    <label class="block relative border border-[#1e3a5f] rounded-xl p-4 bg-[#020b18] {{ $isSoldOut ? 'opacity-50 cursor-not-allowed grayscale' : 'cursor-pointer hover:bg-white/5 transition group' }}">
+                        <input type="radio" name="ticket_type_id" value="{{ $ticket->id }}" class="sr-only peer" required {{ $checkStatus }} {{ $isSoldOut ? 'disabled' : '' }} data-stock="{{ $availableStock }}">
                         <div class="absolute inset-0 border-2 border-transparent peer-checked:border-[#cca43b] rounded-xl transition"></div>
                         <div class="flex justify-between items-start">
                             <div>
-                                <!-- Diubah ke $ticket->name sesuai backend -->
                                 <h4 class="text-sm font-semibold text-white">{{ $ticket->name }}</h4>
                                 <p class="text-xxs text-gray-400 mt-1">Kategori {{ $ticket->name }}</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-sm font-bold text-[#cca43b]">Rp {{ number_format($ticket->price, 0, ',', '.') }}</p>
                                 <p class="text-xxs text-gray-500 mt-1">
-                                    @if($ticket->quota > 0)
-                                        {{ $ticket->quota }} sisa
+                                    @if($isSoldOut)
+                                        <span class="text-red-500 font-semibold uppercase tracking-wider text-[9px] border border-red-500/30 px-2 py-0.5 rounded">Habis</span>
                                     @else
-                                        <span class="text-red-500 font-semibold">Habis</span>
+                                        <span class="text-[#4A9FD4]">{{ $availableStock }} sisa</span>
                                     @endif
                                 </p>
                             </div>
@@ -90,9 +105,9 @@
                 <h3 class="text-xxs font-bold tracking-widest text-[#cca43b] uppercase">Jumlah Tiket</h3>
                 
                 <div class="flex items-center space-x-4 bg-transparent py-1 px-2">
-                    <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-[#3b82f6] text-white flex items-center justify-center font-bold text-lg hover:bg-blue-600 transition focus:outline-none">-</button>
+                    <button type="button" id="btn-minus" class="w-8 h-8 rounded-lg bg-[#cca43b]/20 hover:bg-[#cca43b]/40 text-[#cca43b] border border-[#cca43b]/40 flex items-center justify-center font-bold text-lg transition focus:outline-none">-</button>
                     <input type="number" name="quantity" id="ticket-qty" value="1" min="1" max="4" readonly class="w-10 bg-transparent text-center font-bold text-lg text-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                    <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-[#3b82f6] text-white flex items-center justify-center font-bold text-lg hover:bg-blue-600 transition focus:outline-none">+</button>
+                    <button type="button" id="btn-plus" class="w-8 h-8 rounded-lg bg-[#cca43b] text-black flex items-center justify-center font-bold text-lg hover:bg-[#b08b30] transition focus:outline-none">+</button>
                 </div>
                 
                 <p class="text-xxs text-gray-500 font-medium">Maks. 4 tiket per transaksi</p>
@@ -112,7 +127,24 @@
         const qtyInput = document.getElementById('ticket-qty');
         const btnMinus = document.getElementById('btn-minus');
         const btnPlus = document.getElementById('btn-plus');
-        const maxTickets = 4;
+        const maxTicketsLimit = 4;
+
+        function getMaxAvailable() {
+            const selectedRadio = document.querySelector('input[name="ticket_type_id"]:checked');
+            if (selectedRadio) {
+                const stock = parseInt(selectedRadio.getAttribute('data-stock') || 0);
+                return Math.min(maxTicketsLimit, stock);
+            }
+            return 1;
+        }
+
+        // Reset qty when selection changes
+        const radios = document.querySelectorAll('input[name="ticket_type_id"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                qtyInput.value = 1;
+            });
+        });
 
         btnMinus.addEventListener('click', () => {
             let currentVal = parseInt(qtyInput.value);
@@ -123,7 +155,8 @@
 
         btnPlus.addEventListener('click', () => {
             let currentVal = parseInt(qtyInput.value);
-            if (currentVal < maxTickets) {
+            let maxAvailable = getMaxAvailable();
+            if (currentVal < maxAvailable) {
                 qtyInput.value = currentVal + 1;
             }
         });

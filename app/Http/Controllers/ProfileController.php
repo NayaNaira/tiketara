@@ -91,6 +91,11 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        // Proteksi: Harus terverifikasi emailnya
+        if (is_null($user->email_verified_at)) {
+            return redirect()->route('profile.index')->with('error', 'Silakan verifikasi email Anda terlebih dahulu sebelum mengajukan sebagai promoter.');
+        }
+
         // Proteksi: Jika sudah pending atau approved, jangan kasih masuk lagi
         if (!in_array($user->promoter_status, ['none', 'rejected'])) {
             return redirect()->route('profile.index')->with('info', 'Anda sudah mengajukan atau telah menjadi promoter.');
