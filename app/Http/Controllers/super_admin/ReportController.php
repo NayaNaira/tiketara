@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Event;
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
@@ -66,6 +67,24 @@ class ReportController extends Controller
         }
 
         // 🔴 JIKA USER MEMILIH FORMAT PDF (Gunakan Trik Lembar Cetak Print CSS)
-        return view('super.report.pdf_template', compact('orders', 'year'));
+        // Cari event jika ada
+        $event = null;
+
+        if ($request->filled('event_id')) {
+             $event = Event::find($request->event_id);
+        }
+
+        // Nama file otomatis
+        $fileName = $event
+         ? 'Laporan_' . Str::slug($event->title, '_') . '_' . $year . '.pdf'
+         : 'Laporan_Global_Tiketara_' . $year . '.pdf';
+
+        // PDF
+        return response()
+         ->view('super.report.pdf_template', compact('orders', 'year', 'event'))
+         ->header(
+         'Content-Disposition',
+         'inline; filename="' . $fileName . '"'
+         );
     }
 }

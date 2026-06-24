@@ -95,7 +95,7 @@
                 @forelse($events as $event)
                     @php
                         $sold = $event->orders ? $event->orders->where('status', 'paid')->sum('quantity') : 0;
-                        $capacity = $event->ticketTypes ? $event->ticketTypes->sum('capacity') : 0;
+                        $capacity = $event->ticketTypes ? $event->ticketTypes->sum('quota') : 0;
                         $percent = $capacity > 0 ? round(($sold / $capacity) * 100) : 0;
                         
                         $eventDate = \Carbon\Carbon::parse($event->event_date);
@@ -125,7 +125,7 @@
                     @php
                         $sold = $event->orders ? $event->orders->where('status', 'paid')->sum('quantity') : 0;
                         $revenue = $event->orders ? $event->orders->where('status', 'paid')->sum('total_amount') : 0;
-                        $capacity = $event->ticketTypes ? $event->ticketTypes->sum('capacity') : 0;
+                        $capacity = $event->ticketTypes ? $event->ticketTypes->sum('quota') : 0;
                         
                         $eventDate = \Carbon\Carbon::parse($event->event_date);
                         $statusUpper = strtoupper($event->status);

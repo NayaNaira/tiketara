@@ -70,7 +70,7 @@
                             {{ \Carbon\Carbon::parse($event->start_time)->translatedFormat('d M Y') }}<br>
                             <span class="text-xs">{{ \Carbon\Carbon::parse($event->start_time)->format('H:i') }} WIB</span>
                         </td>
-                        <td class="px-6 py-4 text-[#DADADA]">{{ $event->venue }}, {{ $event->city }}</td>
+                        <td class="px-6 py-4 text-[#DADADA]">{{ $event->venue_name }}, {{ $event->city }}</td>
                         <td class="px-6 py-4 text-[#DADADA]">{{ $event->category ?? '-' }}</td>
                         
                         <td class="px-6 py-4 text-[#DADADA]">

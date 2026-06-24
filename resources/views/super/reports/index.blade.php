@@ -74,7 +74,7 @@
                         @php
                             $ticketPaidCount = $event->orders ? $event->orders->where('status', 'paid')->sum('quantity') : 0;
                             $totalRevenue = $event->orders ? $event->orders->where('status', 'paid')->sum('total_amount') : 0;
-                            $maxCapacity = $event->ticketTypes ? $event->ticketTypes->sum('capacity') : 0;
+                            $maxCapacity = $event->ticketTypes ? $event->ticketTypes->sum('quota') : 0;
 
                             $eventDate = \Carbon\Carbon::parse($event->event_date);
                             if ($eventDate->isToday()) {
@@ -101,7 +101,7 @@
                                 {{ $eventDate->format('d M Y') }}<br>
                                 <span class="text-xs text-gray-400">{{ $eventDate->format('H:i') }} WIB</span>
                             </td>
-                            <td class="px-6 py-4 text-[#DADADA]">{{ $event->venue }}, {{ $event->city }}</td>
+                            <td class="px-6 py-4 text-[#DADADA]">{{ $event->venue_name }}, {{ $event->city }}</td>
                             <td class="px-6 py-4 text-[#DADADA]">{{ $event->category }}</td>
                             <td class="px-6 py-4 text-[#DADADA]">{{ number_format($ticketPaidCount) }}/{{ number_format($maxCapacity) }}</td>
                             <td class="px-6 py-4 text-[#DADADA]">

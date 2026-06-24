@@ -12,7 +12,7 @@
     @php
         $ticketPaidCount = $event ? ($event->orders ? $event->orders->where('status', 'paid')->sum('quantity') : 0) : $stats['total_tickets'];
         $totalRevenue = $event ? ($event->orders ? $event->orders->where('status', 'paid')->sum('total_amount') : 0) : $stats['total_revenue'];
-        $maxCapacity = $event ? ($event->ticketTypes ? $event->ticketTypes->sum('quota') : 0) : 0;
+        $maxCapacity = $event ? $event->ticketTypes->sum('quota'): ($stats['total_capacity'] ?? 0);
         
         // Menghitung rasio sukses penjualan tiket asli
         $successRatio = $event ? ($maxCapacity > 0 ? round(($ticketPaidCount / $maxCapacity) * 100, 1) : 0) : $stats['success_ratio'];

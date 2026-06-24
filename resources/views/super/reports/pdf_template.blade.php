@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Keuangan Tiketara - {{ $year }}</title>
+    <title>
+        @if(isset($event) && $event)
+        Laporan_{{ Str::slug($event->title, '_') }}_{{ $year }}
+        @else
+        Laporan_Global_Tiketara_{{ $year }}
+        @endif
+    </title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

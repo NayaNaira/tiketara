@@ -77,7 +77,7 @@ class AuthController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok',
         ]);
 
-        // Buat akun dengan status ACTIVE agar bisa login, namun belum diverifikasi (email_verified_at = null)
+        // Buat akun dengan status ACTIVE agar bisa login
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,

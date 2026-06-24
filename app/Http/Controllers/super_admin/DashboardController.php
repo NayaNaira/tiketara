@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Order;
+use App\Models\TicketType;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -15,11 +16,13 @@ class DashboardController extends Controller
      */
     public function summary()
     {
-        $events = Event::where('status', '!=', 'draft')
-            ->where('status', '!=', 'DRAFT')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+        $events = Event::with([
+             'orders',
+             'ticketTypes'
+         ])
+         ->whereNotIn('status', ['draft', 'DRAFT'])
+         ->latest()
+           ->get();
             
         $totalEvents = Event::where('status', '!=', 'draft')
             ->where('status', '!=', 'DRAFT')
@@ -49,24 +52,53 @@ class DashboardController extends Controller
     /**
      * Menampilkan Halaman Detail Laporan per Event Sebelum Diunduh
      */
-    public function showReport($id)
-    {
-        // Ambil data event spesifik yang bukan draft beserta relasinya
-        $event = Event::with(['ticketTypes', 'orders.user'])
-            ->where('status', '!=', 'draft')
-            ->where('status', '!=', 'DRAFT')
-            ->findOrFail($id);
+  public function showReport($id)
+{
+    $event = Event::with(['ticketTypes', 'orders.user'])
+        ->where('status', '!=', 'draft')
+        ->where('status', '!=', 'DRAFT')
+        ->findOrFail($id);
 
-        // Hitung akumulasi data untuk dipakai di halaman export.blade.php
-        $stats = [
-            'total_revenue' => $event->orders->where('status', 'paid')->sum('total_amount'),
-            'total_tickets' => $event->orders->where('status', 'paid')->sum('quantity'),
-            'success_ratio' => 100
-        ];
+    $stats = [
+        'total_revenue' => $event->orders
+            ->where('status', 'paid')
+            ->sum('total_amount'),
 
-        // Meneruskan data event spesifik ke export.blade.php
-        return view('super.reports.export', compact('event', 'stats'));
+        'total_tickets' => $event->orders
+            ->where('status', 'paid')
+            ->sum('quantity'),
+
+        'success_ratio' => 100
+    ];
+
+    // Grafik pendapatan bulanan khusus event
+    $monthlyData = [];
+
+    for ($month = 1; $month <= 12; $month++) {
+
+        $revenue = Order::where('events_id', $event->id)
+            ->where('status', 'paid')
+            ->whereMonth('created_at', $month)
+            ->whereYear(
+                'created_at',
+                \Carbon\Carbon::parse($event->event_date)->year
+            )
+            ->sum('total_amount');
+
+        $monthlyData[] = $revenue;
     }
+
+    $maxRevenue = max($monthlyData) ?: 1;
+
+    $monthlyData = array_map(function ($value) use ($maxRevenue) {
+        return round(($value / $maxRevenue) * 100, 2);
+    }, $monthlyData);
+
+    return view(
+        'super.reports.export',
+        compact('event', 'stats', 'monthlyData')
+    );
+}
 
     /**
      * Halaman Form Konfigurasi & Aksi Download Laporan Tahunan Global
@@ -86,6 +118,7 @@ class DashboardController extends Controller
             $stats = [
                 'total_revenue' => Order::where('status', 'paid')->sum('total_amount'),
                 'total_tickets' => Order::where('status', 'paid')->sum('quantity'),
+                'total_capacity' => TicketType::sum('quota'),
                 'success_ratio' => 100 
             ];
 
